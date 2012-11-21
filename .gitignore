@@ -5,3 +5,5 @@
 /backups/*
 /elpa/*
 custom.el
+/emacsmate-org.el
+/emacsmate-org.elc

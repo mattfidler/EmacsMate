@@ -18,7 +18,7 @@ I haven't put project management into effect yet.
 Typically TextMate uses [[http://www.emacswiki.org/CuaMode][Cua Mode]].  This does not provide all the
 traditional key bindings, so I also use [[http://ergoemacs.org/emacs/ergonomic_emacs_keybinding.html][ErgoEmacs Keybindings]]. This
 doesn't quite work with org-mode, so as a hack, I have devised
-[[https://github.com/mlf176f2/org-cua-dwim.el][org-cua-dwim.el]].
+[[https://github.com/mlf176f2/org-cua-dwim.el][org-cua-dwim.el]].                
 * Templates
 Textmate implements templates on creating a new file, see
 [[http://manual.macromates.com/en/templates][TextMate Manual » Templates]].  Currently, the new file templates are
@@ -75,7 +75,6 @@ Xemacs).  See:
 http://stackoverflow.com/questions/1230245/how-to-automatically-save-files-on-lose-focus-in-emacs
 
 However, saving can be toggled when actions occur in emacs.
-
 
 
 * Bookmarks
@@ -189,13 +188,14 @@ This is based on my changing [[http://eschulte.me/emacs24-starter-kit/][Emacs St
       ido-ubiquitous
       melpa
       org-cua-dwim
+      org-table-comment
       pos-tip
       smex
       yasnippet
+      ssh
       textmate-to-yas
       tabbar-ruler)
     "Libraries that should be installed by default.")
-  
 #+END_SRC
 
 *** ELPA functions
@@ -785,6 +785,18 @@ Org mode setup is in a separate file
   (emacsmate-load-org
    (expand-file-name "emacsmate-org.org" emacsmate-dir))
 #+END_SRC
+*** SSH
+#+BEGIN_SRC emacs-lisp
+  (when (and (eq system-type 'windows-nt) (executable-find "plink"))
+    (setq ssh-program (executable-find "plink"))
+    (defun plinkx (session)
+      "Connects to a saved plink session"
+      (interactive (list (read-from-minibuffer "Saved Session: ")))
+      (ssh (concat "-load " session) (concat "*" session "*"))
+      (message "%s" session)))
+  
+#+END_SRC
+
 ** Misc Settings
 *** Window systems Settings
 #+begin_src emacs-lisp 

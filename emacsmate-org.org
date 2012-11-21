@@ -53,7 +53,7 @@ emacs:
   (define-key ergoemacs-keymap (kbd "M-C-,") 'org-clock-in)
   (define-key ergoemacs-keymap (kbd "M-<") 'bh/clock-in-last-task)
   (define-key ergoemacs-keymap (kbd "M-b") 'mlf/punch-in-or-out) 
-  (define-key global-keymap (kbd "C-ca") 'org-agenda)
+  (define-key ergoemacs-keymap (kbd "C-c a") 'org-agenda)
   
   (add-hook 'org-mode-hook
             (lambda ()

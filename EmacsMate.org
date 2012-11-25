@@ -193,6 +193,8 @@ This is based on my changing [[http://eschulte.me/emacs24-starter-kit/][Emacs St
       smex
       yasnippet
       ssh
+      htmlize
+      zenburn-theme
       textmate-to-yas
       tabbar-ruler)
     "Libraries that should be installed by default.")
@@ -296,6 +298,13 @@ a lambda doesn't already exist in the list.
   "Enable things that are convenient across all coding buffers."
   (run-hooks 'emacsmate-coding-hook))
 #+end_src
+*** Color Theme
+The EmacsMate package uses the Zenburn theme by default.
+#+BEGIN_SRC emacs-lisp
+  (require 'zenburn-theme)
+  
+#+END_SRC
+
 ** Load Path, etc
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'load-path emacsmate-dir)
@@ -411,6 +420,7 @@ macro allows auto-installing of modes or packages:
           ("\\.[Ss][Tt][Aa][Tt][Aa]\\'"  stata-mode ess "lisp/ess-site")
           ("\\.[RrSs][Nn][Ww]\\'" Rnw-mode ess "lisp/ess-site")
           ("\\.[Nn][Ss][Ii]" nsis-mode nsis-mode)
+          ("\\.[Mm][Uu][Ss][Ee]" muse-mode muse)
           ("\\.[Uu][Mm][Ll]" plantuml-mode plantuml-mode)
           ("\\.[Nn][Ss][Hh]" nsis-mode nsis-mode)))
   
@@ -508,13 +518,11 @@ I also drop the =M-x=, =M-c=, =M-v= bindings for ergoemacs
     (define-key ergoemacs-keymap "\M-c" nil)
     (define-key ergoemacs-keymap "\M-x" nil)
     (define-key ergoemacs-keymap "\M-z" nil)
-    (when (string= ergoemacs-keyboard-layout "colemak")
-      (define-key ergoemacs-keymap "\M-o" 'isearch-forward-regexp)
-      (define-key ergoemacs-keymap "\M-O" 'isearch-backward-regexp))
-    (define-key ergoemacs-keymap "\M-a" 'smex-if-exists))
+    (define-key ergoemacs-keymap ergoemacs-execute-extended-command-key 'smex-if-exists))
   
   (cua-mode)
   (org-cua-dwim-activate)
+  
 #+END_SRC
 *** Additional Key Bindings
 Help should allow apropos binding

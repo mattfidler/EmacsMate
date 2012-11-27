@@ -159,8 +159,11 @@ This is based on my changing [[http://eschulte.me/emacs24-starter-kit/][Emacs St
       zenburn-theme
       solarized-theme
       textmate-to-yas
+      multiple-cursors
+      expand-region
       tabbar-ruler)
     "Libraries that should be installed by default.")
+  
 #+END_SRC
 
 *** ELPA functions
@@ -470,10 +473,20 @@ I also drop the =M-x=, =M-c=, =M-v= bindings for ergoemacs
   (when (emacsmate-packge-load-path 'ergoemacs-keybindings)
     (require 'ergoemacs-mode)
     (ergoemacs-mode 1)
-    (define-key ergoemacs-keymap "\M-c" nil)
-    (define-key ergoemacs-keymap "\M-x" nil)
-    (define-key ergoemacs-keymap "\M-z" nil)
-    (define-key ergoemacs-keymap ergoemacs-execute-extended-command-key 'smex-if-exists))
+    (require 'expand-region)
+    (define-key ergoemacs-keymap ergoemacs-extend-selection-key
+      'er/expand-region)
+    (require 'multiple-cursors)
+    (define-key ergoemacs-keymap ergoemacs-select-text-in-quote-key
+      'mc/edit-lines)
+    (define-key ergoemacs-keymap ergoemacs-execute-extended-command-key 'smex-if-exists)
+    (define-key ergoemacs-keymap (kbd "C->") 'mc/mark-next-like-this)
+    (define-key ergoemacs-keymap (kbd "C-<") 'mc/mark-previous-like-this)
+    (define-key ergoemacs-keymap (kbd "C-c C-<") 'mc/mark-all-like-this))
+  
+  (global-set-key (kbd "C->") 'mc/mark-next-like-this)
+  (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+  (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
   
   (cua-mode)
   (org-cua-dwim-activate)
@@ -850,7 +863,7 @@ let them live in the backups/directory inside of the emacsmate directory.
                                    emacsmate-dir) t)))
   
   (setq backup-directory-alist
-        `(("." . ,(expand-file-name "backups"
+        `((".*" . ,(expand-file-name "backups"
                                     emacsmate-dir))))
   
   ;; From http://emacswiki.org/emacs/BackupDirectory

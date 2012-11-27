@@ -39,44 +39,6 @@ Under windows:
 
 This is implemented in the [[id:3484edff-15e3-47d5-85e5-76251d4b8776][Printing]] section.
 
-* Saving Files
-** Backups
-Rather than saving backup files scattered all over the file system,
-let them live in the backups/directory inside of the emacsmate directory.
-#+BEGIN_SRC emacs-lisp
-  (unless (file-exists-p (expand-file-name "backups" emacsmate-dir))
-    (make-directory (expand-file-name "backups" emacsmate-dir)))
-  
-  (setq auto-save-file-name-transforms
-        `((".*" ,temporary-file-directory t)))
-  
-  (setq backup-directory-alist
-        `(("." . ,(expand-file-name "backups"
-                                    emacsmate-dir))))
-  
-  ;; From http://emacswiki.org/emacs/BackupDirectory
-  (message "Deleting old backup files...")
-  (let ((week (* 60 60 24 7))
-        (current (float-time (current-time))))
-    (dolist (file (directory-files temporary-file-directory t))
-      (when (and (backup-file-name-p file)
-                 (> (- current (float-time (fifth (file-attributes file))))
-                    week))
-        (message "%s" file)
-        (delete-file file))))
-  
-#+END_SRC
-
-** Encoding
-** Save Automatically when
-*** Focus is lost?
-I don't believe this can be implemented in emacs (though it can in
-Xemacs).  See:
-http://stackoverflow.com/questions/1230245/how-to-automatically-save-files-on-lose-focus-in-emacs
-
-However, saving can be toggled when actions occur in emacs.
-
-
 * Bookmarks
 :PROPERTIES:
 :ID: 99a99dfe-41b6-40ec-ae8e-44d2a3d8ae81
@@ -195,6 +157,7 @@ This is based on my changing [[http://eschulte.me/emacs24-starter-kit/][Emacs St
       ssh
       htmlize
       zenburn-theme
+      solarized-theme
       textmate-to-yas
       tabbar-ruler)
     "Libraries that should be installed by default.")
@@ -298,13 +261,6 @@ a lambda doesn't already exist in the list.
   "Enable things that are convenient across all coding buffers."
   (run-hooks 'emacsmate-coding-hook))
 #+end_src
-*** Color Theme
-The EmacsMate package uses the Zenburn theme by default.
-#+BEGIN_SRC emacs-lisp
-  (require 'zenburn-theme)
-  
-#+END_SRC
-
 ** Load Path, etc
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'load-path emacsmate-dir)
@@ -354,8 +310,7 @@ macro allows auto-installing of modes or packages:
     PACKAGE is the package name
     DOCSTRING is the documentation string
     FILE is the file name of the load path"
-    `(let ((fn ,file))
-       (if fn
+    `(let ((fn ,file))       (if fn
            (progn
              (if (not (file-exists-p fn))
                  (unless (file-exists-p (concat fn ".el"))
@@ -615,7 +570,6 @@ To setup the right-fringe functionality you would use:
 (setq bm-marker 'bm-marker-right)
 #+END_SRC
 
-
 *** Emacs Lisp
 :PROPERTIES:
 :CUSTOM_ID: emacs-lisp
@@ -652,15 +606,6 @@ This does the following:
       (set (make-local-variable 'autopair-skip-whitespace) 'chomp)))
   
   (add-hook 'emacs-lisp-mode-hook 'emacsmate-add-extra-autopairs)
-  
-  (defun emacsmate-change-adaptive-filling-el ()
-    "Changes Emacs Lisp adaptive filling comments"
-    (interactive)
-    (set (make-local-variable 'adaptive-fill-regexp)
-         "[ \t]*\\([-–!|#%;>*·•‣⁃◦;]+[ \t]*\\)*")
-    (set (make-local-variable 'adaptive-fill-first-line-regexp)
-         "\\`[ \t]*[;]*[ \t]*\\'"))
-  (add-hook 'emacs-lisp-mode-hook 'emacsmate-change-adaptive-filling-el)
   
   
 #+end_src
@@ -745,7 +690,6 @@ I like the look.  I don't like the arrow keys not doing what I expect...
       (ido-initiate-auto-merge (current-buffer))))
 #+END_SRC
 
-
 *** Scheme
 :PROPERTIES:
 :CUSTOM_ID: scheme
@@ -757,7 +701,6 @@ I like the look.  I don't like the arrow keys not doing what I expect...
 (font-lock-add-keywords 'scheme-mode
 			'(("(\\|)" . 'emacsmate-paren-face)))
 #+end_src
-
 
 *** Recent Files
 #+BEGIN_SRC emacs-lisp
@@ -794,9 +737,12 @@ Org mode setup is in a separate file
    (expand-file-name "emacsmate-org.org" emacsmate-dir))
 #+END_SRC
 *** SSH
+Make plinkx the default method on windows.  I have had less problems
+with this method.
 #+BEGIN_SRC emacs-lisp
   (when (and (eq system-type 'windows-nt) (executable-find "plink"))
     (setq ssh-program (executable-find "plink"))
+    (setq tramp-default-method "plinkx")
     (defun plinkx (session)
       "Connects to a saved plink session"
       (interactive (list (read-from-minibuffer "Saved Session: ")))
@@ -835,7 +781,6 @@ Org mode setup is in a separate file
     (make-directory desktop-dirname t))
   
 #+end_src
-
 
 *** Compression settings
 #+BEGIN_SRC emacs-lisp
@@ -891,4 +836,54 @@ Setup global tabbar and ruler.
      (set-face-foreground 'magit-diff-add "green3")
      (set-face-foreground 'magit-diff-del "red3")))
 #+end_src
+
+** Saving Files
+*** Backups
+Rather than saving backup files scattered all over the file system,
+let them live in the backups/directory inside of the emacsmate directory.
+#+BEGIN_SRC emacs-lisp
+  (unless (file-exists-p (expand-file-name "backups" emacsmate-dir))
+    (make-directory (expand-file-name "backups" emacsmate-dir)))
+  
+  (setq auto-save-file-name-transforms
+        `((".*" ,(expand-file-name "backups"
+                                   emacsmate-dir) t)))
+  
+  (setq backup-directory-alist
+        `(("." . ,(expand-file-name "backups"
+                                    emacsmate-dir))))
+  
+  ;; From http://emacswiki.org/emacs/BackupDirectory
+  (message "Deleting old backup files...")
+  (condition-case err
+      (let ((week (* 60 60 24 7))
+            (current (float-time (current-time))))
+        (dolist (file (directory-files (expand-file-name "backups"
+                                                         emacsmate-dir) t))
+          (when (and (backup-file-name-p file)
+                     (> (- current (float-time (fifth (file-attributes file))))
+                        week))
+            (message "%s" file)
+            (delete-file file))))
+    (error (message "Error deleting old backup files")))
+  
+#+END_SRC
+
+*** Encoding
+*** Save Automatically when
+**** Focus is lost?
+I don't believe this can be implemented in emacs (though it can in
+Xemacs).  See:
+http://stackoverflow.com/questions/1230245/how-to-automatically-save-files-on-lose-focus-in-emacs
+
+However, saving can be toggled when actions occur in emacs.
+** Color Theme
+The EmacsMate package uses the Zenburn theme by default.
+#+BEGIN_SRC emacs-lisp
+  (condition-case err
+      (when (emacsmate-packge-load-path 'zenburn-theme)
+        (load-theme 'zenburn t))
+    (error (message "Error Loading zenburn theme.")))
+  
+#+END_SRC
 

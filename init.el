@@ -68,7 +68,7 @@
 
 (emacsmate-m "Added lisp/src as magic source directory.")
 
-(require 'org-install)
+(require 'org)
 (emacsmate-m "Loaded latest Org-file")
 
 ;;(setq debug-on-error t)

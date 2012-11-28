@@ -47,13 +47,13 @@ emacs:
 |-------+--------------------------------|
 
 #+BEGIN_SRC emacs-lisp
-  (define-key ergoemacs-keymap (kbd "M-C-m") 'org-agenda)
-  (define-key ergoemacs-keymap (kbd "M-m") 'org-capture)
-  (define-key ergoemacs-keymap (kbd "M-,") 'org-clock-goto)
-  (define-key ergoemacs-keymap (kbd "M-C-,") 'org-clock-in)
-  (define-key ergoemacs-keymap (kbd "M-<") 'bh/clock-in-last-task)
-  (define-key ergoemacs-keymap (kbd "M-b") 'mlf/punch-in-or-out) 
-  (define-key ergoemacs-keymap (kbd "C-c a") 'org-agenda)
+  ;; (define-key ergoemacs-keymap (kbd "M-C-m") 'org-agenda)
+  ;; (define-key ergoemacs-keymap (kbd "M-m") 'org-capture)
+  ;; (define-key ergoemacs-keymap (kbd "M-,") 'org-clock-goto)
+  ;; (define-key ergoemacs-keymap (kbd "M-C-,") 'org-clock-in)
+  ;; (define-key ergoemacs-keymap (kbd "M-<") 'bh/clock-in-last-task)
+  ;; (define-key ergoemacs-keymap (kbd "M-b") 'mlf/punch-in-or-out) 
+  ;; (define-key ergoemacs-keymap (kbd "C-c a") 'org-agenda)
   
   (add-hook 'org-mode-hook
             (lambda ()
@@ -72,7 +72,7 @@ emacs:
               (add-to-list 'org-tab-first-hook 'yas/org-very-safe-expand)
               (define-key yas/keymap [tab] 'yas/next-field)
               ))
-  
+  (emacsmate-m "Org bindings")
 #+END_SRC
   
 * Tasks and States
@@ -257,6 +257,7 @@ Here is my setup for org-capture
                 ("h" "Habit" entry (file "~/org/refile.org")
                  "* NEXT %?\n%U\n%a\nSCHEDULED: %t .+1d/3d\n:PROPERTIES:\n:STYLE: habit\n:REPEAT_TO_STATE: NEXT\n:END:\n  %i"))))
   
+  (emacsmate-m "Org Templates")
 #+end_src
 
 The =%i= in the templates inserts any text in the kill ring as part of
@@ -393,7 +394,7 @@ Here is my refile configuration:
     (not (member (nth 2 (org-heading-components)) org-done-keywords)))
   
   (setq org-refile-target-verify-function 'bh/verify-refile-target)
-  
+  (emacsmate-m "Org Refile")
 #+end_src
 
 To refile a task to my =norang.org= file under =System Maintenance= I
@@ -559,6 +560,7 @@ time waiting for it to be generated.
                 ("A" "Tasks to Archive" tags "-REFILE/"
                  ((org-agenda-overriding-header "Tasks to Archive")
                   (org-agenda-skip-function 'bh/skip-non-archivable-tasks))))))
+  (emacsmate-m "Org Agenda")
 #+end_src
 
 My block agenda view looks like this:
@@ -663,10 +665,8 @@ I use =outlook-org= to capture information for ms outlook.
   (when (eq system-type 'windows-nt)
     (require 'org-outlook nil t))
   (require 'org-protocol)
-  
+  (emacsmate-m "Org Protocol")
 #+END_SRC
-
-
 ** Filtering
 
 So many tasks, so little time.  I have hundreds of tasks at any given
@@ -716,7 +716,7 @@ the description above.
          (concat "-" tag)))
   
   (setq org-agenda-auto-exclude-function 'bh/org-auto-exclude-function)
-  
+  (emacsmate-m "Org Remove Context")
 #+end_src
 
 This lets me filter tasks with just =/ RET= on the agenda which removes tasks I'm not
@@ -1167,6 +1167,8 @@ The following setting shows 1 minute clocking gaps.
                 :min-duration 0
                 :max-gap 0
                 :gap-ok-around ("4:00"))))
+  
+  (emacsmate-m "Org Timing")
 #+end_src
 * Time reporting and tracking
 ** Billing clients based on clocked time
@@ -1366,6 +1368,7 @@ Try not to spend too much time on any one task. Therefore when you are
 over your estimated time sound an alert.
 #+BEGIN_SRC emacs-lisp
   (setq org-clock-sound (expand-file-name "~init/shared/bang_6.wav"))
+  (emacsmate-m "Org Timing")
 #+END_SRC
 
 * Org-mode options
@@ -1522,6 +1525,13 @@ Adapting this to my taste, gives:
           ("pdf" . "~/Articles/PDF/%s.pdf")))
   
 #+END_SRC
+
+** Org Options
+#+BEGIN_SRC emacs-lisp
+  (emacsmate-m "Org Options") 
+#+END_SRC
+ 
+
 
 * Org Export
 I would like to produce =doc= files, this is done by changing the

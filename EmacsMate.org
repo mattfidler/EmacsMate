@@ -665,7 +665,7 @@ explanation of these customizations.
           ido-enable-flex-matching t
           ido-create-new-buffer 'always
           ido-use-filename-at-point nil
-          ido-enable-tramp-completion (if (getenv "EPPAGEANT") t nil)
+          ido-enable-tramp-completion t
           ido-everywhere t
           org-completion-use-ido t
           ido-max-prospects 10

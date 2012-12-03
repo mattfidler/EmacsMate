@@ -479,6 +479,10 @@ I also drop the =M-x=, =M-c=, =M-v= bindings for ergoemacs
     (require 'multiple-cursors)
     (define-key ergoemacs-keymap ergoemacs-select-text-in-quote-key
       'mc/edit-lines)
+    
+    (when (emacsmate-packge-load-path 'helm)
+      (when (string= "colemak" (getenv "ERGOEMACS_KEYBOARD_LAYOUT"))
+        (define-key ergoemacs-keymap (kbd "M-o") 'helm-mini)))
     (define-key ergoemacs-keymap ergoemacs-execute-extended-command-key 'smex-if-exists)
     (define-key ergoemacs-keymap (kbd "C->") 'mc/mark-next-like-this)
     (define-key ergoemacs-keymap (kbd "C-<") 'mc/mark-previous-like-this)

@@ -145,7 +145,7 @@ This is based on my changing [[http://eschulte.me/emacs24-starter-kit/][Emacs St
       auto-complete
       auto-indent-mode
       autopair
-      ergoemacs-keybindings
+      ergoemacs-mode
       helm
       ido-ubiquitous
       melpa
@@ -460,9 +460,9 @@ To use CUA-type keys and others, I use:
 - org-cua-dwim to use CUA keys in org-mode.
 - Smex
 
-I also drop the =M-x=, =M-c=, =M-v= bindings for ergoemacs 
-
 #+BEGIN_SRC emacs-lisp
+  ;;; -*- coding: utf-8 -*-
+  
   (autoload 'log-edit-mode "log-edit" "" t)
   (defun smex-if-exists (&optional prefix-arg)
     (interactive "p")
@@ -470,29 +470,35 @@ I also drop the =M-x=, =M-c=, =M-v= bindings for ergoemacs
         (smex)
       (execute-extended-command prefix-arg)))
   
-  (when (emacsmate-packge-load-path 'ergoemacs-keybindings)
+  (defun ergoemacs-key (key function &optional desc)
+    "Defines key in ergoemacs keyboard based on QWERTY."
+    (let (found)
+      (setq ergoemacs-variable-layout
+            (mapcar
+             (lambda(x)
+               (if (not (string= key (nth 0 x)))
+                   x
+                 (setq found t)
+                 `(,key ,function ,desc)))
+             ergoemacs-variable-layout))
+      (unless found
+        (add-to-list 'ergoemacs-variable-layout
+                     `(,key ,function ,desc)))))
+  
+  (when (emacsmate-packge-load-path 'ergoemacs-mode)
     (require 'ergoemacs-mode)
-    (ergoemacs-mode 1)
     (require 'expand-region)
-    (define-key ergoemacs-keymap ergoemacs-extend-selection-key
-      'er/expand-region)
+    (ergoemacs-key "M-a" 'smex-if-exists "M-x")
+    (ergoemacs-key "M-;" 'helm-mini "Helm")
+    (ergoemacs-key "M-8" 'er/expand-region "←region→")
+    (setq expand-region-contract-fast-key (ergoemacs-kbd "7" t))
+    (setq expand-region-reset-fast-key (ergoemacs-kbd "9" t))
     (require 'multiple-cursors)
-    (define-key ergoemacs-keymap ergoemacs-select-text-in-quote-key
-      'mc/edit-lines)
-    
-    (when (emacsmate-packge-load-path 'helm)
-      (when (string= "colemak" (getenv "ERGOEMACS_KEYBOARD_LAYOUT"))
-        (define-key ergoemacs-keymap (kbd "M-o") 'helm-mini)))
-    (define-key ergoemacs-keymap ergoemacs-execute-extended-command-key 'smex-if-exists)
-    (define-key ergoemacs-keymap (kbd "C->") 'mc/mark-next-like-this)
-    (define-key ergoemacs-keymap (kbd "C-<") 'mc/mark-previous-like-this)
-    (define-key ergoemacs-keymap (kbd "C-c C-<") 'mc/mark-all-like-this))
-  
-  (global-set-key (kbd "C->") 'mc/mark-next-like-this)
-  (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-  (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
-  
-  (cua-mode)
+    (ergoemacs-key "M-*" 'mc/mark-next-like-this)
+    (ergoemacs-key "M-n" 'mc/edit-lines)
+    (ergoemacs-setup-keys)                
+    (ergoemacs-mode 1))
+  (cua-mode) 
   (org-cua-dwim-activate)
   
 #+END_SRC

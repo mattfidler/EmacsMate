@@ -161,6 +161,8 @@ This is based on my changing [[http://eschulte.me/emacs24-starter-kit/][Emacs St
       textmate-to-yas
       multiple-cursors
       expand-region
+      dired+
+      linum-off
       tabbar-ruler)
     "Libraries that should be installed by default.")
   
@@ -377,17 +379,41 @@ macro allows auto-installing of modes or packages:
           ("\\.[Ss][Aa][Ss]\\'" sas-mode ess "lisp/ess-site")
           ("\\.[Ss][Tt][Aa][Tt][Aa]\\'"  stata-mode ess "lisp/ess-site")
           ("\\.[RrSs][Nn][Ww]\\'" Rnw-mode ess "lisp/ess-site")
-          ("\\.[Nn][Ss][Ii]" nsis-mode nsis-mode)
-          ("\\.[Mm][Uu][Ss][Ee]" muse-mode muse)
-          ("\\.[Uu][Mm][Ll]" plantuml-mode plantuml-mode)
-          ("\\.[Nn][Ss][Hh]" nsis-mode nsis-mode)))
-  
+          ("\\.[Nn][Ss][Ii]\\'" nsis-mode nsis-mode)
+          ("\\.[Mm][Uu][Ss][Ee]\\'" muse-mode muse)
+          ("\\.[Uu][Mm][Ll]\\'" plantuml-mode plantuml-mode)
+          ("\\.[Nn][Ss][Hh]\\'" nsis-mode nsis-mode)
+          ("\\.[Pp][Hh][Pp]\\'" php-mode php-mode)
+          ;; Visual Basic Mode
+          ;; Csharp mode
+          ("\\.[Cc][Ss]\\'" csharp-mode csharp-mode)
+          ("\\.[Pp][Ss]1\\'" powershell-mode powershell-mode)
+          ;; ntcmd mode
+          ("\\.[Bb][Aa][Tt]\\'" ntcmd-mode ntcmd)
+          ;; Autohotkey
+          ;;
+          ("\\.[Pp][Oo][Vv]\\'"  pov-mode pov-mode)
+          ("\\.[Mm][Ll][iIYyLlPp]?\\'" tuareg-mode tuareg)
+          
+          ;;()
+          ))
+  ;; Powershell
   
   (defvar emacsmate-autoinstall-packages nil
     "Autoinstalled packages")
   
   (setq emacsmate-autoinstall-packages
         '((magit-status magit)
+          (dictionary-search dictionary)
+          (dictionary-match-words dictionary)
+          (dictionary-lookup-definition dictionary)
+          (dictionary dictionary)
+          (dictionary-mous-popup-matching-words dictionary)
+          (dictionary-popup-matching-words dictionary)
+          (dictionary-tooltip-mode dictionary)
+          (global-dictionary-tooltip-mode)
+          (camldebug tuareg)
+          (powershell powershell)
           (org-readme-sync org-readme)
           (textmate-to-yas textmate-to-yas)
           (R ess "lisp/ess-site")))
@@ -455,14 +481,12 @@ This implements printing assuming:
 #+END_SRC
 ** Key Bindings
 To use CUA-type keys and others, I use:
-- Ergoemacs-key bingings
+- Ergoemacs-key bingings, plus a bit extra
 - CUA-mode
 - org-cua-dwim to use CUA keys in org-mode.
 - Smex
 
 #+BEGIN_SRC emacs-lisp
-  ;;; -*- coding: utf-8 -*-
-  
   (autoload 'log-edit-mode "log-edit" "" t)
   (defun smex-if-exists (&optional prefix-arg)
     (interactive "p")
@@ -485,19 +509,68 @@ To use CUA-type keys and others, I use:
         (add-to-list 'ergoemacs-variable-layout
                      `(,key ,function ,desc)))))
   
+  (defun ergoemacs-minor-key (hook list)
+    "Defines keys to add to an ergoemacs keyboard hook."
+    (setq ergoemacs-minor-mode-layout
+          (mapcar
+           (lambda(mode-list)
+             (if (not (equal hook (nth 0 mode-list)))
+                 mode-list
+               (let (found lst)
+                 (setq lst (mapcar
+                            (lambda(key-def)
+                              (if (equal (nth 0 list) (nth 0 key-def))
+                                  (progn
+                                    (setq found t)
+                                    list)
+                                key-def))
+                            (nth 1 mode-list)))
+                 (unless found
+                   (add-to-list 'lst list))
+                 `(,(nth 0 mode-list) ,lst))))
+           ergoemacs-minor-mode-layout)))
+  
   (when (emacsmate-packge-load-path 'ergoemacs-mode)
     (require 'ergoemacs-mode)
     (require 'expand-region)
     (ergoemacs-key "M-a" 'smex-if-exists "M-x")
     (ergoemacs-key "M-;" 'helm-mini "Helm")
-    (ergoemacs-key "M-8" 'er/expand-region "←region→")
+    (ergoemacs-minor-key 'helm-before-initialize-hook `(,(ergoemacs-kbd "M-;" t) helm-keyboard-quit helm-map))
+    ;; Swap ido keys so that up and down are next and previous match,
+    ;; and left and right are history commands.
+    
+    ;; This works with the ido hack to have a vertical display of choices.
+    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(forward-char next-history-element minor-mode-overriding-map-alist))
+    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(backward-char previous-history-element minor-mode-overriding-map-alist))
+    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(previous-line ido-prev-match minor-mode-overriding-map-alist))
+    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(next-line ido-next-match minor-mode-overriding-map-alist))
+    
+    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<right>" next-history-element minor-mode-overriding-map-alist))
+    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<left>" previous-history-element minor-mode-overriding-map-alist))
+    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<up>" ido-prev-match minor-mode-overriding-map-alist))
+    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<down>" ido-next-match minor-mode-overriding-map-alist))
+    
+    (ergoemacs-key "M-8" 'er/expand-region
+                   (format "%sregion%s"
+                           (make-string 1 8592)
+                           (make-string 1 8594)))
+    
+    (ergoemacs-key "M-9" 'er/contract-region
+                   (format "%sregion%s"
+                           (make-string 1 8594)
+                           (make-string 1 8592)))
     (setq expand-region-contract-fast-key (ergoemacs-kbd "7" t))
     (setq expand-region-reset-fast-key (ergoemacs-kbd "9" t))
     (require 'multiple-cursors)
     (ergoemacs-key "M-*" 'mc/mark-next-like-this)
     (ergoemacs-key "M-n" 'mc/edit-lines)
-    (ergoemacs-setup-keys)                
-    (ergoemacs-mode 1))
+    (ergoemacs-setup-keys)
+    (ergoemacs-create-hooks)
+    (ergoemacs-mode 1)
+    ;;
+    (global-set-key "\C-x\C-c" 'ignore)
+    (global-set-key (kbd "C-M-S-Q") 'save-buffers-kill-emacs)
+    )
   (cua-mode) 
   (org-cua-dwim-activate)
   
@@ -508,6 +581,60 @@ Help should allow apropos binding
 (global-set-key (kbd "C-h a") 'apropos)
 #+END_SRC
 
+** Popup right click menu from ergoemacs
+This is the popup menu taken from ErgoEmacs
+#+BEGIN_SRC emacs-lisp
+  ;; Mouse wheel behavior
+  (global-set-key [C-wheel-up] 'text-scale-increase)
+  (global-set-key [C-wheel-down] 'text-scale-decrease)
+  (global-set-key [C-down-mouse-2] 'text-scale-normal-size)
+  
+  ;; Right-click opens the context menu
+  (global-set-key [mouse-3] 'emacsmate-context-menu)
+  
+  (defvar edit-popup-menu
+    '(keymap
+      (undo menu-item "Undo" undo
+            :enable (and
+                     (not buffer-read-only)
+                     (not
+                      (eq t buffer-undo-list))
+                     (if
+                         (eq last-command 'undo)
+                         (listp pending-undo-list)
+                       (consp buffer-undo-list)))
+            :help "Undo last operation"
+            :keys "Ctrl+Z")
+      (separator-undo menu-item "--")
+      (cut menu-item "Cut" clipboard-kill-region
+           :help "Delete text in region and copy it to the clipboard"
+           :keys "Ctrl+X")
+      (copy menu-item "Copy" clipboard-kill-ring-save
+            :help "Copy text in region to the clipboard"
+            :keys "Ctrl+C")
+      (paste menu-item "Paste" clipboard-yank
+             :help "Paste text from clipboard"
+             :keys "Ctrl+V")
+      (paste-from-menu menu-item "Paste from Kill Menu" yank-menu
+                       :enable (and
+                                (cdr yank-menu)
+                                (not buffer-read-only))
+                       :help "Choose a string from the kill ring and paste it")
+      (clear menu-item "Clear" delete-region 
+             :enable (and mark-active (not buffer-read-only))
+             :help "Delete the text in region between mark and current position"
+             :keys "Del")
+      (separator-select-all menu-item "--")
+      (mark-whole-buffer menu-item "Select All" mark-whole-buffer
+                         :help "Mark the whole buffer for a subsequent cut/copy")))
+  
+  (defun emacsmate-context-menu (event)
+    "Pop up a context menu."
+    (interactive "e")
+    (popup-menu edit-popup-menu))
+  
+    
+#+END_SRC
 ** Default Package/Modes Setup
 *** Autopair
 Autopair mode allows parenthesis auto-pairing to occur for all modes
@@ -687,18 +814,13 @@ explanation of these customizations.
 
 See http://www.emacswiki.org/emacs/InteractivelyDoThings
 **** Display Completions Vertically
-I like the look.  I don't like the arrow keys not doing what I expect...
+I like the look.  I don't like the arrow keys not doing what I expect
+(changed with ergoemacs)
 #+BEGIN_SRC emacs-lisp
   (setq ido-decorations (quote ("\n-> " "" "\n   " "\n   ..." "[" "]" " [No match]" " [Matched]" " [Not readable]" " [Too big]" " [Confirm]")))
   
   (defun ido-disable-line-trucation () (set (make-local-variable 'truncate-lines) nil))
   (add-hook 'ido-minibuffer-setup-hook 'ido-disable-line-trucation)
-  
-  
-  (defcustom emacsmate-ido-swap-keys t
-    "Swaps arrow keys for ido-mode so that down and up is next/previous candidate and left/right are the history keys."
-    :type 'boolean
-    :group 'emacsmate)
 #+END_SRC
 
 
@@ -774,6 +896,82 @@ with this method.
   
 #+END_SRC
 
+*** Whitespace mode
+#+BEGIN_SRC emacs-lisp
+  ;; Taken from ergoemacs
+  (defun toggle-whitespace-setting ()
+    "Toggle some display settings for `whitespace-mode'."
+    (interactive)
+    (let (stateBefore stateAfter (statesList '(0 1)))
+      (setq stateBefore (if (get 'toggle-whitespace-setting 'state) (get 'toggle-whitespace-setting 'state) (elt statesList 0)))
+      (setq stateAfter (% (+ stateBefore (length statesList) 1) (length statesList)))
+      (put 'toggle-whitespace-setting 'state stateAfter)
+      
+      (cond
+       ((equal stateAfter 0)
+        (progn
+          (setq whitespace-style '(tabs spaces trailing lines space-before-tab newline indentation empty space-after-tab space-mark tab-mark newline-mark))
+          (setq whitespace-display-mappings
+                '((space-mark 32 [183] [46])
+                  (space-mark 160 [164] [95])
+                  (space-mark 2208 [2212] [95])
+                  (space-mark 2336 [2340] [95])
+                  (space-mark 3616 [3620] [95])
+                  (space-mark 3872 [3876] [95])
+                  (newline-mark 10 [36 10])
+                  (tab-mark 9 [187 9] [92 9]))
+                )
+          (message "whitespace-setting set to default.")
+          ))
+       ((equal stateAfter 1)
+        (progn
+          ;; Make whitespace-mode with very basic background coloring for whitespaces
+          (setq whitespace-style '( spaces tabs newline space-mark tab-mark newline-mark ))
+          
+          ;; Make whitespace-mode and whitespace-newline-mode use paragraph for end of line char and triangle for tab.
+          (setq whitespace-display-mappings
+                '(
+                  (space-mark 32 [183] [46]) ; normal space, MIDDLE DOT, FULL STOP.
+                  (space-mark 160 [164] [95])
+                  (space-mark 2208 [2212] [95])
+                  (space-mark 2336 [2340] [95])
+                  (space-mark 3616 [3620] [95])
+                  (space-mark 3872 [3876] [95])
+                  (newline-mark 10 [182 10]) ; newlne
+                  (tab-mark 9 [9655 9] [92 9]) ; tab
+                  )) 
+          (message "whitespace-setting set to using %s for tab and %s for newline."
+                   (make-string 1 9655) (make-string 1 182)))))
+      
+      (when global-whitespace-mode (global-whitespace-mode 0) (global-whitespace-mode 1))
+      (when whitespace-mode (whitespace-mode 0) (whitespace-mode 1))
+      
+      ))
+  (progn
+    ;; Make whitespace-mode with very basic background coloring for whitespaces.
+    ;; http://ergoemacs.org/emacs/whitespace-mode.html
+    (setq whitespace-style (quote ( spaces tabs newline space-mark tab-mark newline-mark )))
+    
+    ;; Make whitespace-mode and whitespace-newline-mode use paragraph marks for end of line char and triangles for for tab.
+    (setq whitespace-display-mappings
+          ;; all numbers are unicode codepoint in decimal. e.g. (insert-char 182 1)
+          '(
+            (space-mark 32 [183] [46]) ; SPACE 32, 183 MIDDLE DOT, 46 FULL STOP
+            (newline-mark 10 [182 10]) ; LINE FEED, 
+            (tab-mark 9 [9655 9] [92 9]) ; tab
+            )) )
+#+END_SRC
+*** Perl
+Use Cperl instead of perl-mode
+#+BEGIN_SRC emacs-lisp
+  ;; use cperl-mode instead of perl-mode
+  (setq auto-mode-alist (rassq-delete-all 'perl-mode auto-mode-alist))
+  (add-to-list 'auto-mode-alist '("\\.\\(p\\([lm]\\)\\)\\'" . cperl-mode))
+  (setq interpreter-mode-alist (rassq-delete-all 'perl-mode interpreter-mode-alist))
+  (add-to-list 'interpreter-mode-alist '("perl" . cperl-mode))
+  (add-to-list 'interpreter-mode-alist '("perl5" . cperl-mode))
+  (add-to-list 'interpreter-mode-alist '("miniperl" . cperl-mode))
+#+END_SRC
 ** Misc Settings
 *** Window systems Settings
 #+begin_src emacs-lisp 
@@ -782,7 +980,13 @@ with this method.
     (set-terminal-coding-system 'utf-8)
     (set-keyboard-coding-system 'utf-8)
     (prefer-coding-system 'utf-8)
-    (require 'saveplace)
+    (put 'narrow-to-region 'disabled nil)
+    (put 'upcase-region 'disabled nil)
+    (put 'downcase-region 'disabled nil)
+    (put 'erase-buffer 'disabled nil)
+    (put 'scroll-left 'disabled nil)
+    (put 'dired-find-alternate-file 'disabled nil)
+    
   
     (setq visible-bell t
           echo-keystrokes 0.1
@@ -805,6 +1009,18 @@ with this method.
   
 #+end_src
 
+*** Camel Case
+Make camel case backward word work.
+#+BEGIN_SRC emacs-lisp
+(when (fboundp 'global-subword-mode ) (global-subword-mode 1))
+#+END_SRC
+*** Line Numbering
+#+begin_src emacs-lisp
+  (when (emacsmate-packge-load-path 'linum-off)
+    (require 'linum-off)
+    (global-linum-mode 1))
+    
+#+end_src
 *** Compression settings
 #+BEGIN_SRC emacs-lisp
 (auto-compression-mode t)

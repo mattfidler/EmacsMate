@@ -9,11 +9,14 @@ project readmes.
 Other than the project readmes, I have the followind org files to
 collect non-work related tasks:
 
-|-----------+---------------------------------------------|
-| Filename  | Description                                 |
-|-----------+---------------------------------------------|
-| todo.org  | Main File of personal tasks                 |
-|-----------+---------------------------------------------|
+|------------+-----------------------------|
+| Filename   | Description                 |
+|------------+-----------------------------|
+| todo.org   | Main File of personal tasks |
+| diary.org  | Journal                     |
+| weekly.org | Weekly Review               |
+| daily.org  | Daily Review                |
+|------------+-----------------------------|
 
 The following org-file collects org-capture notes and tasks.
 |------------+-------------|
@@ -234,6 +237,8 @@ and pick the appropriate capture task.
 Here is my setup for org-capture
 
 #+begin_src emacs-lisp :tangle yes
+  (when (not (file-exists-p "~/org"))
+    (make-directory "~/org"))
   (setq org-default-notes-file "~/org/refile.org")
   
   ;; Capture templates for: TODO tasks, Notes, appointments, phone calls, and org-protocol
@@ -241,9 +246,14 @@ Here is my setup for org-capture
         (quote (("t" "todo" entry (file "~/org/refile.org")
                  "* TODO %?\n%U\n%a\n  %i" :clock-in t :clock-resume t)
                 ("d" "Daily Review" plain (file+datetree "~/org/daily.org")
-                 "%[~/org/five-minute.org]" :clock-in t :clock-resume t)
+                 (format "%%[%s/five-minute.org]"
+                         (expand-file-name "etc"
+                                           emacsmate-dir)) :clock-in t :clock-resume t)
                 ("k" "Weekly Review" plain (file+datetree "~/org/weekly.org")
-                 "%[~/org/gtd-weekly.org]" :clock-in t :clock-resume t)
+                 (format "%%[%s/gtd-weekly.org]"
+                         (expand-file-name "etc"
+                                           emacsmate-dir))
+                 :clock-in t :clock-resume t)
                 ("n" "note" entry (file "~/org/refile.org")
                  "* %? :NOTE:\n%U\n%a\n  %i" :clock-in t :clock-resume t)
                 ("j" "Journal" entry (file+datetree "~/org/diary.org")
@@ -258,6 +268,7 @@ Here is my setup for org-capture
                  "* NEXT %?\n%U\n%a\nSCHEDULED: %t .+1d/3d\n:PROPERTIES:\n:STYLE: habit\n:REPEAT_TO_STATE: NEXT\n:END:\n  %i"))))
   
   (emacsmate-m "Org Templates")
+  
 #+end_src
 
 The =%i= in the templates inserts any text in the kill ring as part of
@@ -1519,11 +1530,6 @@ Adapting this to my taste, gives:
     (interactive)
     (org-open-link-from-string (format "[[notes:%s]]" (reftex-citation t))))
   
-  (setq org-link-abbrev-alist
-        '(("bib" . "~/Articles/generalOcular.bib::%s")
-          ("notes" . "~/Articles/generalOcular.org::#%s")
-          ("pdf" . "~/Articles/PDF/%s.pdf")))
-  
 #+END_SRC
 
 ** Org Options
@@ -1545,13 +1551,3 @@ LibreOffice.
 
 
 * Org-mode Wish List/Todo List
-** TODO Make org-clocking save buffer after clocking in.
-[2011-12-15 Thu 15:19]
-[[file:~/org/todo.org::*Gym][Gym]]
-** TODO Make archive save the file
-[2011-12-15 Thu 16:47]
-[[file:~/org/todo.org_archive]]
-** STARTED Make org-mode do checklists like on the screen shots
-:LOGBOOK:
-CLOCK: [2011-12-16 Fri 16:37]--[2011-12-16 Fri 16:45] =>  0:08
-:END:

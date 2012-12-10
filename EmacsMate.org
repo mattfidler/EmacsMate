@@ -15,6 +15,20 @@ project management tools for emacs:
 
 I have implemented projectile support because it has some support for
 version control-based projects.
+
+** Creating Projects
+Projects with projectile are created from github, bzr, etc
+repositories are automatically considered projects.
+** Filtering Unwanted files
+Unwanted files are filtered with a =.projectile= file.
+** Navigating files in a project
+When files are opened, the tabbar groups them by Projectile Project.
+** Find and Replace in Projects
+This can be accessed in the Projectile menu or keybindings.
+** Moving between project files
+
+** Using Helm
+
 * Key Bindings
 Typically TextMate uses [[http://www.emacswiki.org/CuaMode][Cua Mode]].  This does not provide all the
 traditional key bindings, so I also use [[http://ergoemacs.org/emacs/ergonomic_emacs_keybinding.html][ErgoEmacs Keybindings]]. This
@@ -163,6 +177,7 @@ This is based on my changing [[http://eschulte.me/emacs24-starter-kit/][Emacs St
       multiple-cursors
       expand-region
       dired+
+      info+
       linum-off
       projectile
       tabbar-ruler)
@@ -512,7 +527,14 @@ To use CUA-type keys and others, I use:
                      `(,key ,function ,desc)))))
   
   (defun ergoemacs-minor-key (hook list)
-    "Defines keys to add to an ergoemacs keyboard hook."
+    "Defines keys to add to an ergoemacs keyboard hook.
+  
+  Adds to the list `ergoemacs-minor-mode-layout' by modifying the
+  ergoemacs hook applied to HOOK.  The LIST is of the following
+  format:
+  
+   (FUNCTION/KEY FUNCTION-TO-CALL KEYMAP)
+  "
     (setq ergoemacs-minor-mode-layout
           (mapcar
            (lambda(mode-list)
@@ -521,11 +543,11 @@ To use CUA-type keys and others, I use:
                (let (found lst)
                  (setq lst (mapcar
                             (lambda(key-def)
-                              (if (equal (nth 0 list) (nth 0 key-def))
+                              (if (and (equal (nth 0 list) (nth 0 key-def))
+                                       (equal (nth 2 list) (nth 2 key-def)))
                                   (progn
                                     (setq found t)
-                                    list)
-                                key-def))
+                                    list)))
                             (nth 1 mode-list)))
                  (unless found
                    (add-to-list 'lst list))
@@ -542,15 +564,21 @@ To use CUA-type keys and others, I use:
     ;; and left and right are history commands.
     
     ;; This works with the ido hack to have a vertical display of choices.
-    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(forward-char next-history-element minor-mode-overriding-map-alist))
-    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(backward-char previous-history-element minor-mode-overriding-map-alist))
-    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(previous-line ido-prev-match minor-mode-overriding-map-alist))
-    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(next-line ido-next-match minor-mode-overriding-map-alist))
+    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(forward-char ido-next-match-dir ido-file-dir-completion-map))
+    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(backward-char ido-prev-match-dir ido-file-dir-completion-map))
+    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<right>" ido-next-match-dir ido-file-dir-completion-map))
+    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<left>" ido-prev-match-dir ido-file-dir-completion-map))
     
-    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<right>" next-history-element minor-mode-overriding-map-alist))
-    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<left>" previous-history-element minor-mode-overriding-map-alist))
-    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<up>" ido-prev-match minor-mode-overriding-map-alist))
-    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<down>" ido-next-match minor-mode-overriding-map-alist))
+    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(forward-char ido-next-match-dir ido-file-completion-map))
+    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(backward-char ido-prev-match-dir ido-file-completion-map))
+    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<right>" ido-next-match-dir ido-file-completion-map))
+    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<left>" ido-prev-match-dir ido-file-completion-map))
+    
+    
+    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(previous-line ido-prev-match ido-common-completion-map))
+    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(next-line ido-next-match ido-common-completion-map))
+    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<up>" ido-prev-match ido-common-completion-map))
+    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<down>" ido-next-match ido-common-completion-map))
     
     (ergoemacs-key "M-8" 'er/expand-region
                    (format "%sregion%s"
@@ -564,10 +592,9 @@ To use CUA-type keys and others, I use:
     (setq expand-region-contract-fast-key (ergoemacs-kbd "7" t))
     (setq expand-region-reset-fast-key (ergoemacs-kbd "9" t))
     (require 'multiple-cursors)
-    (ergoemacs-key "M-*" 'mc/mark-next-like-this)
-    (ergoemacs-key "M-n" 'mc/edit-lines)
+    (ergoemacs-key "M-*" 'mc/mark-next-like-this "Mark Next")
+    (ergoemacs-key "M-n" 'mc/edit-lines "Edit Lines")
     (ergoemacs-setup-keys)
-    (ergoemacs-create-hooks)
     (ergoemacs-mode 1)
     ;;
     (global-set-key "\C-x\C-c" 'ignore)
@@ -974,6 +1001,26 @@ Use Cperl instead of perl-mode
   (add-to-list 'interpreter-mode-alist '("perl5" . cperl-mode))
   (add-to-list 'interpreter-mode-alist '("miniperl" . cperl-mode))
 #+END_SRC
+*** Helm
+Helm uses eshell, so starting eshell before running helm is useful.
+However it is a trade-off of start-time vs helm start-time.  If helm
+isn't used, the extra start time is not useful.  For this reason, I
+will load eshell only if helm is loaded
+
+#+BEGIN_SRC emacs-lisp
+  (eval-after-load "helm"
+    (let ((default-directory (getenv "HOME")))
+      (command-execute 'eshell)
+      (bury-buffer)))
+#+END_SRC
+
+*** Dired+
+#+BEGIN_SRC emacs-lisp
+  (when (emacsmate-packge-load-path 'dired+)
+    (require 'dired+))
+#+END_SRC
+*** Info+
+
 ** Misc Settings
 *** Window systems Settings
 #+begin_src emacs-lisp 
@@ -1103,7 +1150,11 @@ Also set it up to be used with projectile.
      (set-face-foreground 'magit-diff-del "red3")))
 #+end_src
 
-** Saving Files
+** Saving File
+#+BEGIN_SRC emacs-lisp
+  (when (emacsmate-packge-load-path info+)
+    (require 'info+))
+#+END_SRC
 *** Backups
 Rather than saving backup files scattered all over the file system,
 let them live in the backups/directory inside of the emacsmate directory.
@@ -1111,13 +1162,13 @@ let them live in the backups/directory inside of the emacsmate directory.
   (unless (file-exists-p (expand-file-name "backups" emacsmate-dir))
     (make-directory (expand-file-name "backups" emacsmate-dir)))
   
+  (setq backup-directory-alist
+        `((".*" . ,(expand-file-name "backups"
+                                     emacsmate-dir))))
+  
   (setq auto-save-file-name-transforms
         `((".*" ,(expand-file-name "backups"
                                    emacsmate-dir) t)))
-  
-  (setq backup-directory-alist
-        `((".*" . ,(expand-file-name "backups"
-                                    emacsmate-dir))))
   
   ;; From http://emacswiki.org/emacs/BackupDirectory
   (message "Deleting old backup files...")
@@ -1152,4 +1203,6 @@ The EmacsMate package uses the Zenburn theme by default.
     (error (message "Error Loading zenburn theme.")))
   
 #+END_SRC
+
+
 

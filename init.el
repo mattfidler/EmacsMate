@@ -100,31 +100,33 @@
                      (message "Error Tangling %s" file)
                    (error "Error Tangling %s" file)))))
       (when (file-exists-p exported-file)
-        (if (and (file-exists-p compiled-file)
-                 (> (age exported-file) (age compiled-file)))
-            (progn
-              (condition-case err
-                  (load-file compiled-file)
-                (error (if emacsmate-grace
-                           (message "Error Loading %s" compiled-file)
-                         (error "Error Loading %s" compiled-file))))
-              (emacsmate-m (format "Loaded %s" compiled-file)))
-          (condition-case err
-              (byte-compile-file exported-file t)
-            (error (if emacsmate-grace
-                       (message "Error Byte-compiling and loading %s" exported-file)
-                     (error "Error Byte-compiling and loading %s" exported-file))))
-          (emacsmate-m (format "Byte-compiled & loaded %s" exported-file))
-          ;; Fallback and load source
-          (if (file-exists-p compiled-file)
-              (set-file-times compiled-file) ; Touch file.
+        (if (and (boundp 'auto-compile-on-load-mode) auto-compile-on-load-mode)
+            (load exported-file)
+          (if (and (file-exists-p compiled-file)
+                   (> (age exported-file) (age compiled-file)))
+              (progn
+                (condition-case err
+                    (load-file compiled-file)
+                  (error (if emacsmate-grace
+                             (message "Error Loading %s" compiled-file)
+                           (error "Error Loading %s" compiled-file))))
+                (emacsmate-m (format "Loaded %s" compiled-file)))
             (condition-case err
-                (load-file exported-file)
+                (byte-compile-file exported-file t)
               (error (if emacsmate-grace
-                         (message "Error loading %s" exported-file)
-                       (error "Error loading %s" exported-file))))
-            (emacsmate-m (format "Loaded %s since byte-compile failed."
-                                 exported-file))))))))
+                         (message "Error Byte-compiling and loading %s" exported-file)
+                       (error "Error Byte-compiling and loading %s" exported-file))))
+            (emacsmate-m (format "Byte-compiled & loaded %s" exported-file))
+            ;; Fallback and load source
+            (if (file-exists-p compiled-file)
+                (set-file-times compiled-file) ; Touch file.
+              (condition-case err
+                  (load-file exported-file)
+                (error (if emacsmate-grace
+                           (message "Error loading %s" exported-file)
+                         (error "Error loading %s" exported-file))))
+              (emacsmate-m (format "Loaded %s since byte-compile failed."
+                                   exported-file)))))))))
 
 ;; load up emacsmate
 (emacsmate-load-org

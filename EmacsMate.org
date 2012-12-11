@@ -145,6 +145,34 @@ See [[http://manual.macromates.com/en/using_textmate_from_terminal.html][Calling
 * Getting Help
 * Implementation
 This is based on my changing [[http://eschulte.me/emacs24-starter-kit/][Emacs Starter Kit]] and [[http://batsov.com/prelude/][Prelude]]
+** Declaring functions that are unknown to compilers
+#+BEGIN_SRC emacs-lisp
+  (declare-function ergoemacs-kbd "ergoemacs-mode")
+  (declare-function ergoemacs-setup-keys "ergoemacs-mode")
+  (declare-function ergoemacs-mode "ergoemacs-mode")
+  (declare-function org-cua-dwim-activate "org-cua-dwim")
+  
+  (declare-function autopair-global-mode "autopair")
+  
+  (declare-function ac-config-default "auto-complete-config")
+  
+  (declare-function pos-tip-w32-max-width-height "pos-tip")
+  
+  (declare-function ido-ubiquitous "ido-ubiquitous")
+  
+  (declare-function yas-global-mode "yasnippet")
+  (declare-function yas-load-directory "yasnippet")
+  (declare-function yas-expand "yasnippet")
+  
+  (declare-function ssh "ssh")
+  
+  (declare-function global-undo-tree-mode "undo-tree")
+  
+  (declare-function projectile-global-mode "projectile")
+  (declare-function projectile-project-root "projectile")
+  (declare-function projectile-project-name "projectile")
+#+END_SRC
+
 ** Functions and Customization Groups
 *** Customizable group
 #+BEGIN_SRC emacs-lisp
@@ -162,6 +190,7 @@ This is based on my changing [[http://eschulte.me/emacs24-starter-kit/][Emacs St
       autopair
       ergoemacs-mode
       helm
+      undo-tree
       ido-ubiquitous
       melpa
       org-cua-dwim
@@ -209,7 +238,7 @@ This is based on my changing [[http://eschulte.me/emacs24-starter-kit/][Emacs St
       (when default-directory
         (if (not subdirs)
             (add-to-list 'load-path (emacsmate-package-dir package))
-          normal-top-level-add-subdirs-to-load-path))
+          (normal-top-level-add-subdirs-to-load-path)))
       (symbol-value 'default-directory)))
 #+END_SRC
 *** The emacsmate-coding-hook:
@@ -231,6 +260,7 @@ a lambda doesn't already exist in the list.
     (set (make-local-variable 'comment-auto-fill-only-comments) t)
     (auto-fill-mode t))
   
+  (defvar save-place nil)
   (defun emacsmate-turn-on-save-place-mode ()
     (setq save-place t))
   
@@ -286,14 +316,19 @@ a lambda doesn't already exist in the list.
 ** Load Path, etc
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'load-path emacsmate-dir)
-  (setq autoload-file (concat emacsmate-dir "loaddefs.el"))
-  (setq package-user-dir (concat emacsmate-dir "elpa"))
+  (defvar autoload-file (concat emacsmate-dir "loaddefs.el")
+    "EmacsMate autoload file")
+  (require 'package)
+  (when (boundp 'package-user-dir)
+    (setq package-user-dir (concat emacsmate-dir "elpa")))
+  
   (setq custom-file (concat emacsmate-dir "custom.el"))
 #+END_SRC
 ** Ubiquitous Packages
 #+BEGIN_SRC emacs-lisp
   (require 'package)
-  (require 'cl)
+  (with-no-warnings
+    (require 'cl))
   (require 'saveplace)
   (require 'ffap)
   (require 'uniquify)
@@ -466,29 +501,29 @@ This implements printing assuming:
     "Paper size for Emacs Printing"
     :type 'string
     :group 'emacsmate)
-  
-  (if (executable-find "gtklp")
-      (progn
-        (setq ps-lpr-command (executable-find "gtklp")))
-    (let ((gsprint (and (getenv "ProgramFiles")
-                        (if (file-exists-p (format "%s/Ghostgum/gsview/gsprint.exe"
-                                                   (getenv "ProgramFiles")))
-                            (format "%s/Ghostgum/gsview/gsprint.exe"
-                                    (getenv "ProgramFiles"))
-                          nil))))
-      (if (or gsprint (executable-find "gsprint"))
+  (with-no-warnings
+    (if (executable-find "gtklp")
         (progn
-          (setq-default ps-lpr-command (or gsprint (executable-find "gsprint")))
-          (setq-default ps-printer-name t)
-          (setq-default ps-printer-name-option nil)
-          (setq ps-lpr-switches '("-query")) ; show printer dialog
-          (setq ps-right-header '("/pagenumberstring load" ps-time-stamp-mon-dd-yyyy)))
-      (when (executable-find "gswin32c")
-        (setq ps-printer-name t)
-        (setq ps-lpr-command (executable-find "gswin32c"))
-        (setq ps-lpr-switches `("-q" "-dNOPAUSE" "-dBATCH"
-                                "-sDEVICE=mswinpr2"
-                                ,(format "-sPAPERSIZE=%s" emacsmate-paper-size)))))))
+          (setq ps-lpr-command (executable-find "gtklp")))
+      (let ((gsprint (and (getenv "ProgramFiles")
+                          (if (file-exists-p (format "%s/Ghostgum/gsview/gsprint.exe"
+                                                     (getenv "ProgramFiles")))
+                              (format "%s/Ghostgum/gsview/gsprint.exe"
+                                      (getenv "ProgramFiles"))
+                            nil))))
+        (if (or gsprint (executable-find "gsprint"))
+            (progn
+              (setq-default ps-lpr-command (or gsprint (executable-find "gsprint")))
+              (setq-default ps-printer-name t)
+              (setq-default ps-printer-name-option nil)
+              (setq ps-lpr-switches '("-query")) ; show printer dialog
+              (setq ps-right-header '("/pagenumberstring load" ps-time-stamp-mon-dd-yyyy)))
+          (when (executable-find "gswin32c")
+            (setq ps-printer-name t)
+            (setq ps-lpr-command (executable-find "gswin32c"))
+            (setq ps-lpr-switches `("-q" "-dNOPAUSE" "-dBATCH"
+                                    "-sDEVICE=mswinpr2"
+                                    ,(format "-sPAPERSIZE=%s" emacsmate-paper-size))))))))
 #+END_SRC
 ** Coding Hook
 
@@ -514,17 +549,18 @@ To use CUA-type keys and others, I use:
   (defun ergoemacs-key (key function &optional desc)
     "Defines key in ergoemacs keyboard based on QWERTY."
     (let (found)
-      (setq ergoemacs-variable-layout
-            (mapcar
-             (lambda(x)
-               (if (not (string= key (nth 0 x)))
-                   x
-                 (setq found t)
-                 `(,key ,function ,desc)))
-             ergoemacs-variable-layout))
-      (unless found
-        (add-to-list 'ergoemacs-variable-layout
-                     `(,key ,function ,desc)))))
+      (when (boundp 'ergoemacs-variable-layout)
+        (setq ergoemacs-variable-layout
+              (mapcar
+               (lambda(x)
+                 (if (not (string= key (nth 0 x)))
+                     x
+                   (setq found t)
+                   `(,key ,function ,desc)))
+               ergoemacs-variable-layout))
+        (unless found
+          (add-to-list 'ergoemacs-variable-layout
+                       `(,key ,function ,desc))))))
   
   (defun ergoemacs-minor-key (hook list)
     "Defines keys to add to an ergoemacs keyboard hook.
@@ -535,28 +571,28 @@ To use CUA-type keys and others, I use:
   
    (FUNCTION/KEY FUNCTION-TO-CALL KEYMAP)
   "
-    (setq ergoemacs-minor-mode-layout
-          (mapcar
-           (lambda(mode-list)
-             (if (not (equal hook (nth 0 mode-list)))
-                 mode-list
-               (let (found lst)
-                 (setq lst (mapcar
-                            (lambda(key-def)
-                              (if (and (equal (nth 0 list) (nth 0 key-def))
-                                       (equal (nth 2 list) (nth 2 key-def)))
-                                  (progn
-                                    (setq found t)
-                                    list)))
-                            (nth 1 mode-list)))
-                 (unless found
-                   (add-to-list 'lst list))
-                 `(,(nth 0 mode-list) ,lst))))
-           ergoemacs-minor-mode-layout)))
+    (when (boundp 'ergoemacs-minor-mode-layout)
+      (setq ergoemacs-minor-mode-layout
+            (mapcar
+             (lambda(mode-list)
+               (if (not (equal hook (nth 0 mode-list)))
+                   mode-list
+                 (let (found lst)
+                   (setq lst (mapcar
+                              (lambda(key-def)
+                                (if (and (equal (nth 0 list) (nth 0 key-def))
+                                         (equal (nth 2 list) (nth 2 key-def)))
+                                    (progn
+                                      (setq found t)
+                                      list)))
+                              (nth 1 mode-list)))
+                   (unless found
+                     (add-to-list 'lst list))
+                   `(,(nth 0 mode-list) ,lst))))
+             ergoemacs-minor-mode-layout))))
   
   (when (emacsmate-packge-load-path 'ergoemacs-mode)
     (require 'ergoemacs-mode)
-    (require 'expand-region)
     (ergoemacs-key "M-a" 'smex-if-exists "M-x")
     (ergoemacs-key "M-;" 'helm-mini "Helm")
     (ergoemacs-minor-key 'helm-before-initialize-hook `(,(ergoemacs-kbd "M-;" t) helm-keyboard-quit helm-map))
@@ -579,7 +615,7 @@ To use CUA-type keys and others, I use:
     (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(next-line ido-next-match ido-common-completion-map))
     (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<up>" ido-prev-match ido-common-completion-map))
     (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<down>" ido-next-match ido-common-completion-map))
-    
+    (require 'expand-region)
     (ergoemacs-key "M-8" 'er/expand-region
                    (format "%sregion%s"
                            (make-string 1 8592)
@@ -589,8 +625,10 @@ To use CUA-type keys and others, I use:
                    (format "%sregion%s"
                            (make-string 1 8594)
                            (make-string 1 8592)))
-    (setq expand-region-contract-fast-key (ergoemacs-kbd "7" t))
-    (setq expand-region-reset-fast-key (ergoemacs-kbd "9" t))
+    (when (boundp 'expand-region-contract-fast-key)
+      (setq expand-region-contract-fast-key (ergoemacs-kbd "7" t)))
+    (when (boundp 'expand-region-reset-fast-key)
+      (setq expand-region-reset-fast-key (ergoemacs-kbd "9" t)))
     (require 'multiple-cursors)
     (ergoemacs-key "M-*" 'mc/mark-next-like-this "Mark Next")
     (ergoemacs-key "M-n" 'mc/edit-lines "Edit Lines")
@@ -598,8 +636,7 @@ To use CUA-type keys and others, I use:
     (ergoemacs-mode 1)
     ;;
     (global-set-key "\C-x\C-c" 'ignore)
-    (global-set-key (kbd "C-M-S-Q") 'save-buffers-kill-emacs)
-    )
+    (global-set-key (kbd "C-M-S-Q") 'save-buffers-kill-emacs))
   (cua-mode) 
   (org-cua-dwim-activate)
   
@@ -670,18 +707,23 @@ Autopair mode allows parenthesis auto-pairing to occur for all modes
 not just list like paredit.  See [[http://www.emacswiki.org/emacs/AutoPairs#toc3][EmacsWiki: Auto Pairs]].
 #+BEGIN_SRC emacs-lisp
   (autopair-global-mode 1)
-  (setq autopair-skip-whitespace t)
+  (when (boundp 'autopair-skip-whitespace)
+    (setq autopair-skip-whitespace t))
+  
 #+END_SRC
 
 *** Auto-indent-mode
 The autoindent package is something that I find quite useful.  I also
 like to insert some TextMate behaviors to my keys.
 #+BEGIN_SRC emacs-lisp
-  (setq auto-indent-key-for-end-of-line-then-newline "<M-return>")
-  (setq auto-indent-key-for-end-of-line-insert-char-then-newline "<M-S-return>")
-  (setq auto-indent-kill-line-at-eol nil)
-  (setq auto-indent-delete-line-char-remove-extra-spaces t)
-  (auto-indent-global-mode)
+  (with-no-warnings
+    (setq auto-indent-key-for-end-of-line-then-newline "<M-return>")
+    (setq auto-indent-key-for-end-of-line-insert-char-then-newline "<M-S-return>")
+    (setq auto-indent-kill-line-at-eol nil)
+    (setq auto-indent-delete-line-char-remove-extra-spaces t))
+  
+  (when (fboundp 'auto-indent-global-mode)
+    (auto-indent-global-mode))
 #+END_SRC
 *** Auto-complete mode
 Auto complete mode setup
@@ -692,19 +734,27 @@ Auto complete mode setup
 #+END_SRC 
 **** Show menu
 #+BEGIN_SRC emacs-lisp
-  (setq ac-auto-show-menu t)
-  (setq ac-auto-start 2)
-  (setq ac-delay 0)
+  (when (boundp 'ac-auto-show-menu)
+    (setq ac-auto-show-menu t))
+  (when (boundp 'ac-auto-start)
+    (setq ac-auto-start 2))
+  (when (boundp 'ac-delay)
+    (setq ac-delay 0))
+  
+  
   
 #+END_SRC
 **** Finish completion by tab
 #+BEGIN_SRC emacs-lisp
-  (define-key ac-completing-map "\t" 'ac-complete)
-  (define-key ac-completing-map "\r" nil)
+  (when (boundp 'ac-completing-map)
+    (define-key ac-completing-map "\t" 'ac-complete)
+    (define-key ac-completing-map "\r" nil))
+  
 #+END_SRC
 **** Ignore case
 #+BEGIN_SRC emacs-lisp
-  (setq ac-ignore-case 'smart)
+  (when (boundp 'ac-ignore-case)
+    (setq ac-ignore-case 'smart))
 #+END_SRC
 **** Pos Tip for "beautiful" tips
 #+BEGIN_SRC emacs-lisp
@@ -712,7 +762,7 @@ Auto complete mode setup
     (require 'pos-tip)
     (when (eq system-type 'windows-nt)
       (condition-case err
-          (progn
+          (when (= 23 emacs-major-version)
             (pos-tip-w32-max-width-height nil))
         (error (message "Error in postip")))))
 #+END_SRC
@@ -743,10 +793,11 @@ Using M$ visual studio style bookmarks:
 To setup the right-fringe functionality you would use:
 
 #+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "<left-fringe> <mouse-5>") 'bm-next-mouse)
-(global-set-key (kbd "<left-fringe> <mouse-4>") 'bm-previous-mouse)
-(global-set-key (kbd "<left-fringe> <mouse-1>") 'bm-toggle-mouse)
-(setq bm-marker 'bm-marker-right)
+  (global-set-key (kbd "<left-fringe> <mouse-5>") 'bm-next-mouse)
+  (global-set-key (kbd "<left-fringe> <mouse-4>") 'bm-previous-mouse)
+  (global-set-key (kbd "<left-fringe> <mouse-1>") 'bm-toggle-mouse)
+  (when (boundp 'bm-marker)
+    (setq bm-marker 'bm-marker-right))
 #+END_SRC
 
 *** Emacs Lisp
@@ -776,13 +827,15 @@ This does the following:
                     (delete-file (concat buffer-file-name "c"))))))
   
   (defun emacsmate-add-extra-autopairs ()
-    "To add extra autopairs and change autopair behaviour"
+    "To add extra autopairs and change autopair behavior"
     (when (boundp 'autopair-extra-pairs)
-      (push '(?` . ?')
-            (getf autopair-extra-pairs :comment))
-      (push '(?` . ?')
-            (getf autopair-extra-pairs :string))
-      (set (make-local-variable 'autopair-skip-whitespace) 'chomp)))
+      (when (boundp 'autopair-extra-pairs)
+        (push '(?` . ?')
+              (getf autopair-extra-pairs :comment))
+        (push '(?` . ?')
+              (getf autopair-extra-pairs :string))
+        (when (boundp 'autopair-skip-whitespace)
+          (set (make-local-variable 'autopair-skip-whitespace) 'chomp)))))
   
   (add-hook 'emacs-lisp-mode-hook 'emacsmate-add-extra-autopairs)
   
@@ -896,12 +949,15 @@ I like the look.  I don't like the arrow keys not doing what I expect
   
   (defun yas-org-setup ()
     ;; yasnippet (using the new org-cycle hooks)
-    (make-variable-buffer-local 'yas-trigger-key)
-    (setq yas-trigger-key [tab])
-    (add-to-list 'org-tab-first-hook 'yas-org-very-safe-expand)
-    (define-key yas-keymap [tab] 'yas-next-field))
+    (when (boundp 'yas-trigger-key)
+      (set (make-local-variable 'yas-trigger-key) [tab]))
+    (when (boundp 'org-tab-first-hook)
+      (add-to-list 'org-tab-first-hook 'yas-org-very-safe-expand))
+    (when (boundp 'yas-keymap)
+      (define-key yas-keymap [tab] 'yas-next-field)))
   
-  (add-hook 'org-mode-hook #'yas-org-setup)
+  (when (boundp 'org-mode-hook)
+    (add-hook 'org-mode-hook #'yas-org-setup))
 #+END_SRC
 
 *** Org-mode
@@ -915,7 +971,8 @@ Make plinkx the default method on windows.  I have had less problems
 with this method.
 #+BEGIN_SRC emacs-lisp
   (when (and (eq system-type 'windows-nt) (executable-find "plink"))
-    (setq ssh-program (executable-find "plink"))
+    (with-no-warnings
+      (setq ssh-program (executable-find "plink")))
     (setq tramp-default-method "plinkx")
     (defun plinkx (session)
       "Connects to a saved plink session"
@@ -928,55 +985,57 @@ with this method.
 *** Whitespace mode
 #+BEGIN_SRC emacs-lisp
   ;; Taken from ergoemacs
-  (defun toggle-whitespace-setting ()
-    "Toggle some display settings for `whitespace-mode'."
-    (interactive)
-    (let (stateBefore stateAfter (statesList '(0 1)))
-      (setq stateBefore (if (get 'toggle-whitespace-setting 'state) (get 'toggle-whitespace-setting 'state) (elt statesList 0)))
-      (setq stateAfter (% (+ stateBefore (length statesList) 1) (length statesList)))
-      (put 'toggle-whitespace-setting 'state stateAfter)
-      
-      (cond
-       ((equal stateAfter 0)
-        (progn
-          (setq whitespace-style '(tabs spaces trailing lines space-before-tab newline indentation empty space-after-tab space-mark tab-mark newline-mark))
-          (setq whitespace-display-mappings
-                '((space-mark 32 [183] [46])
-                  (space-mark 160 [164] [95])
-                  (space-mark 2208 [2212] [95])
-                  (space-mark 2336 [2340] [95])
-                  (space-mark 3616 [3620] [95])
-                  (space-mark 3872 [3876] [95])
-                  (newline-mark 10 [36 10])
-                  (tab-mark 9 [187 9] [92 9]))
-                )
-          (message "whitespace-setting set to default.")
-          ))
-       ((equal stateAfter 1)
-        (progn
-          ;; Make whitespace-mode with very basic background coloring for whitespaces
-          (setq whitespace-style '( spaces tabs newline space-mark tab-mark newline-mark ))
-          
-          ;; Make whitespace-mode and whitespace-newline-mode use paragraph for end of line char and triangle for tab.
-          (setq whitespace-display-mappings
-                '(
-                  (space-mark 32 [183] [46]) ; normal space, MIDDLE DOT, FULL STOP.
-                  (space-mark 160 [164] [95])
-                  (space-mark 2208 [2212] [95])
-                  (space-mark 2336 [2340] [95])
-                  (space-mark 3616 [3620] [95])
-                  (space-mark 3872 [3876] [95])
-                  (newline-mark 10 [182 10]) ; newlne
-                  (tab-mark 9 [9655 9] [92 9]) ; tab
-                  )) 
-          (message "whitespace-setting set to using %s for tab and %s for newline."
-                   (make-string 1 9655) (make-string 1 182)))))
-      
-      (when global-whitespace-mode (global-whitespace-mode 0) (global-whitespace-mode 1))
-      (when whitespace-mode (whitespace-mode 0) (whitespace-mode 1))
-      
-      ))
-  (progn
+  (with-no-warnings
+    (defun toggle-whitespace-setting ()
+      "Toggle some display settings for `whitespace-mode'."
+      (interactive)
+      (let (stateBefore stateAfter (statesList '(0 1)))
+        (setq stateBefore (if (get 'toggle-whitespace-setting 'state) (get 'toggle-whitespace-setting 'state) (elt statesList 0)))
+        (setq stateAfter (% (+ stateBefore (length statesList) 1) (length statesList)))
+        (put 'toggle-whitespace-setting 'state stateAfter)
+        (cond
+         ((equal stateAfter 0)
+          (progn
+            (when (boundp 'whitespace-style)
+              (setq whitespace-style '(tabs spaces trailing lines space-before-tab newline indentation empty space-after-tab space-mark tab-mark newline-mark)))
+            (when (boundp 'whitespace-display-mappings)
+              (setq whitespace-display-mappings
+                    '((space-mark 32 [183] [46])
+                      (space-mark 160 [164] [95])
+                      (space-mark 2208 [2212] [95])
+                      (space-mark 2336 [2340] [95])
+                      (space-mark 3616 [3620] [95])
+                      (space-mark 3872 [3876] [95])
+                      (newline-mark 10 [36 10])
+                      (tab-mark 9 [187 9] [92 9]))))
+            (message "whitespace-setting set to default.")))
+         ((equal stateAfter 1)
+          (progn
+            ;; Make whitespace-mode with very basic background coloring for whitespaces
+            (setq whitespace-style '( spaces tabs newline space-mark tab-mark newline-mark ))
+            
+            ;; Make whitespace-mode and whitespace-newline-mode use paragraph for end of line char and triangle for tab.
+            (setq whitespace-display-mappings
+                  '(
+                    (space-mark 32 [183] [46]) ; normal space, MIDDLE DOT, FULL STOP.
+                    (space-mark 160 [164] [95])
+                    (space-mark 2208 [2212] [95])
+                    (space-mark 2336 [2340] [95])
+                    (space-mark 3616 [3620] [95])
+                    (space-mark 3872 [3876] [95])
+                    (newline-mark 10 [182 10]) ; newlne
+                    (tab-mark 9 [9655 9] [92 9]) ; tab
+                    )) 
+            (message "whitespace-setting set to using %s for tab and %s for newline."
+                     (make-string 1 9655) (make-string 1 182)))))
+        
+        (when (and (boundp 'global-whitespace-mode) global-whitespace-mode)
+          (global-whitespace-mode 0) (global-whitespace-mode 1))
+        (when (and (boundp 'whitespace-mode) whitespace-mode)
+          (whitespace-mode 0) (whitespace-mode 1))
+        
+        ))
+    (with-no-warnings
     ;; Make whitespace-mode with very basic background coloring for whitespaces.
     ;; http://ergoemacs.org/emacs/whitespace-mode.html
     (setq whitespace-style (quote ( spaces tabs newline space-mark tab-mark newline-mark )))
@@ -988,7 +1047,7 @@ with this method.
             (space-mark 32 [183] [46]) ; SPACE 32, 183 MIDDLE DOT, 46 FULL STOP
             (newline-mark 10 [182 10]) ; LINE FEED, 
             (tab-mark 9 [9655 9] [92 9]) ; tab
-            )) )
+            ))))
 #+END_SRC
 *** Perl
 Use Cperl instead of perl-mode
@@ -1021,6 +1080,13 @@ will load eshell only if helm is loaded
 #+END_SRC
 *** Info+
 
+*** Undo Tree
+#+BEGIN_SRC emacs-lisp
+  (when (emacsmate-packge-load-path 'undo-tree)
+    (require 'undo-tree)
+    (global-undo-tree-mode))
+#+END_SRC
+
 ** Misc Settings
 *** Window systems Settings
 #+begin_src emacs-lisp 
@@ -1037,22 +1103,23 @@ will load eshell only if helm is loaded
     (put 'dired-find-alternate-file 'disabled nil)
     
   
-    (setq visible-bell t
-          echo-keystrokes 0.1
-          font-lock-maximum-decoration t
-          inhibit-startup-message t
-          transient-mark-mode t
-          color-theme-is-global t
-          delete-by-moving-to-trash t
-          shift-select-mode nil
-          truncate-partial-width-windows nil
-          uniquify-buffer-name-style 'forward
-          whitespace-style '(trailing lines space-before-tab
-                                      indentation space-after-tab)
-          whitespace-line-column 100
-          ediff-window-setup-function 'ediff-setup-windows-plain
-          xterm-mouse-mode t
-          save-place t))
+    (with-no-warnings
+      (setq visible-bell t
+            echo-keystrokes 0.1
+            font-lock-maximum-decoration t
+            inhibit-startup-message t
+            transient-mark-mode t
+            color-theme-is-global t
+            delete-by-moving-to-trash t
+            shift-select-mode nil
+            truncate-partial-width-windows nil
+            uniquify-buffer-name-style 'forward
+            whitespace-style '(trailing lines space-before-tab
+                                        indentation space-after-tab)
+            whitespace-line-column 100
+            ediff-window-setup-function 'ediff-setup-windows-plain
+            xterm-mouse-mode t
+            save-place t)))
   (when (not (file-exists-p desktop-dirname))
     (make-directory desktop-dirname t))
   
@@ -1102,11 +1169,13 @@ Turn on save history to save history between sessions.
 *** Tabbar/Ruler & Project Management
 Setup global tabbar and ruler.
 #+BEGIN_SRC emacs-lisp
-  (setq tabbar-ruler-global-tabbar 't) ; If you want tabbar
-  (setq tabbar-ruler-global-ruler 't) ; if you want a global ruler
-  (setq tabbar-ruler-popup-menu 't) ; If you want a popup menu.
-  (setq tabbar-ruler-popup-toolbar 't) ; If you want a popup toolbar
   (when (emacsmate-packge-load-path 'tabbar-ruler)
+    (with-no-warnings
+      (setq tabbar-ruler-global-tabbar 't) ; If you want tabbar
+      (setq tabbar-ruler-global-ruler 't) ; if you want a global ruler
+      (setq tabbar-ruler-popup-menu 't) ; If you want a popup menu.
+      (setq tabbar-ruler-popup-toolbar 't) ; If you want a popup toolbar
+      )
     (require 'tabbar-ruler))
   
 #+END_SRC
@@ -1130,7 +1199,8 @@ Also set it up to be used with projectile.
      ((memq major-mode '(dired-mode)) '("Dir"))
      (t '("Main"))))
   
-  (setq tabbar-buffer-groups-function 'ergoemacs-tabbar-buffer-groups)
+  (with-no-warnings
+    (setq tabbar-buffer-groups-function 'ergoemacs-tabbar-buffer-groups))
 #+END_SRC
 
      
@@ -1152,7 +1222,7 @@ Also set it up to be used with projectile.
 
 ** Saving File
 #+BEGIN_SRC emacs-lisp
-  (when (emacsmate-packge-load-path info+)
+  (when (emacsmate-packge-load-path 'info+)
     (require 'info+))
 #+END_SRC
 *** Backups

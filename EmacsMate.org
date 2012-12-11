@@ -826,16 +826,19 @@ This does the following:
                 (if (file-exists-p (concat buffer-file-name "c"))
                     (delete-file (concat buffer-file-name "c"))))))
   
-  (defun emacsmate-add-extra-autopairs ()
-    "To add extra autopairs and change autopair behavior"
-    (when (boundp 'autopair-extra-pairs)
+  (with-no-warnings
+    (defun emacsmate-add-extra-autopairs ()
+      "To add extra autopairs and change autopair behavior"
+      (when (not (featurep 'cl))
+        (require 'cl))
       (when (boundp 'autopair-extra-pairs)
-        (push '(?` . ?')
-              (getf autopair-extra-pairs :comment))
-        (push '(?` . ?')
-              (getf autopair-extra-pairs :string))
-        (when (boundp 'autopair-skip-whitespace)
-          (set (make-local-variable 'autopair-skip-whitespace) 'chomp)))))
+        (when (boundp 'autopair-extra-pairs)
+          (push '(?` . ?')
+                (getf autopair-extra-pairs :comment))
+          (push '(?` . ?')
+                (getf autopair-extra-pairs :string))
+          (when (boundp 'autopair-skip-whitespace)
+            (set (make-local-variable 'autopair-skip-whitespace) 'chomp))))))
   
   (add-hook 'emacs-lisp-mode-hook 'emacsmate-add-extra-autopairs)
   

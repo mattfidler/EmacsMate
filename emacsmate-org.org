@@ -243,14 +243,14 @@ Here is my setup for org-capture
   
   ;; Capture templates for: TODO tasks, Notes, appointments, phone calls, and org-protocol
   (setq org-capture-templates
-        (quote (("t" "todo" entry (file "~/org/refile.org")
+        `(("t" "todo" entry (file "~/org/refile.org")
                  "* TODO %?\n%U\n%a\n  %i" :clock-in t :clock-resume t)
                 ("d" "Daily Review" plain (file+datetree "~/org/daily.org")
-                 (format "%%[%s/five-minute.org]"
+                 ,(format "%%[%s/five-minute.org]"
                          (expand-file-name "etc"
                                            emacsmate-dir)) :clock-in t :clock-resume t)
                 ("k" "Weekly Review" plain (file+datetree "~/org/weekly.org")
-                 (format "%%[%s/gtd-weekly.org]"
+                 ,(format "%%[%s/gtd-weekly.org]"
                          (expand-file-name "etc"
                                            emacsmate-dir))
                  :clock-in t :clock-resume t)
@@ -265,7 +265,7 @@ Here is my setup for org-capture
                 ("p" "Phone call" entry (file "~/org/refile.org")
                  "* PHONE %? :PHONE:\n%U" :clock-in t :clock-resume t)
                 ("h" "Habit" entry (file "~/org/refile.org")
-                 "* NEXT %?\n%U\n%a\nSCHEDULED: %t .+1d/3d\n:PROPERTIES:\n:STYLE: habit\n:REPEAT_TO_STATE: NEXT\n:END:\n  %i"))))
+                 "* NEXT %?\n%U\n%a\nSCHEDULED: %t .+1d/3d\n:PROPERTIES:\n:STYLE: habit\n:REPEAT_TO_STATE: NEXT\n:END:\n  %i")))
   
   (emacsmate-m "Org Templates")
   

@@ -135,6 +135,34 @@ This is implemented by autopair-mode
 * Regular Expressions
 * Calling Emacs from other applications
 See [[http://manual.macromates.com/en/using_textmate_from_terminal.html][Calling TextMate from Other Applications]]
+** Browsers
+*** Chromium/Chrome
+Type Control-Shift-B.  Add a bookmark.  The name should be Org Capture
+
+The web address should be:
+#+BEGIN_SRC js
+  javascript:location.href='org-protocol://capture://'+encodeURIComponent(location.href)+'/'+encodeURIComponent(document.title)+'/'+encodeURIComponent(window.getSelection()).replace(/'/g,"%27").replace(/\(/g,"%28").replace(/\)/g,"%29")javascript:location.href='org-protocol://capture://'+encodeURIComponent(location.href)+'/'+encodeURIComponent(document.title)+'/'+encodeURIComponent(window.getSelection()).replace(/'/g,"%27").replace(/\(/g,"%28").replace(/\)/g,"%29")
+#+END_SRC
+
+You could also set the sub-protocol in the capture dialog.  To use the
+org-protocol template included in EmacsMate, use:
+
+#+BEGIN_SRC js
+  javascript:location.href='org-protocol://capture://w/'+encodeURIComponent(location.href)+'/'+encodeURIComponent(document.title)+'/'+encodeURIComponent(window.getSelection()).replace(/'/g,"%27").replace(/\(/g,"%28").replace(/\)/g,"%29")javascript:location.href='org-protocol://capture://'+encodeURIComponent(location.href)+'/'+encodeURIComponent(document.title)+'/'+encodeURIComponent(window.getSelection()).replace(/'/g,"%27").replace(/\(/g,"%28").replace(/\)/g,"%29")
+#+END_SRC
+
+
+Add another bookmark the name should be Org Store Link
+
+The web address should be:
+#+BEGIN_SRC js
+  javascript:location.href='org-protocol://store-link://'+encodeURIComponent(location.href)+'/'+encodeURIComponent(document.title)
+#+END_SRC
+
+You could also make this bound to key by using Google Chrome's
+Shortcut Manager.
+
+
 ** Shell
 
 ** Editor
@@ -171,6 +199,11 @@ This is based on my changing [[http://eschulte.me/emacs24-starter-kit/][Emacs St
   (declare-function projectile-global-mode "projectile")
   (declare-function projectile-project-root "projectile")
   (declare-function projectile-project-name "projectile")
+  
+  (declare-function package-installed-p "package")
+  (declare-function package-version-join "package")
+  (declare-function package-desc-vers "package")
+  (declare-function package--dir "package")
 #+END_SRC
 
 ** Functions and Customization Groups
@@ -209,6 +242,8 @@ This is based on my changing [[http://eschulte.me/emacs24-starter-kit/][Emacs St
       info+
       linum-off
       projectile
+      powerline
+      diminish
       tabbar-ruler)
     "Libraries that should be installed by default.")
   
@@ -546,55 +581,12 @@ To use CUA-type keys and others, I use:
         (smex)
       (execute-extended-command prefix-arg)))
   
-  (defun ergoemacs-key (key function &optional desc)
-    "Defines key in ergoemacs keyboard based on QWERTY."
-    (let (found)
-      (when (boundp 'ergoemacs-variable-layout)
-        (setq ergoemacs-variable-layout
-              (mapcar
-               (lambda(x)
-                 (if (not (string= key (nth 0 x)))
-                     x
-                   (setq found t)
-                   `(,key ,function ,desc)))
-               ergoemacs-variable-layout))
-        (unless found
-          (add-to-list 'ergoemacs-variable-layout
-                       `(,key ,function ,desc))))))
-  
-  (defun ergoemacs-minor-key (hook list)
-    "Defines keys to add to an ergoemacs keyboard hook.
-  
-  Adds to the list `ergoemacs-minor-mode-layout' by modifying the
-  ergoemacs hook applied to HOOK.  The LIST is of the following
-  format:
-  
-   (FUNCTION/KEY FUNCTION-TO-CALL KEYMAP)
-  "
-    (when (boundp 'ergoemacs-minor-mode-layout)
-      (setq ergoemacs-minor-mode-layout
-            (mapcar
-             (lambda(mode-list)
-               (if (not (equal hook (nth 0 mode-list)))
-                   mode-list
-                 (let (found lst)
-                   (setq lst (mapcar
-                              (lambda(key-def)
-                                (if (and (equal (nth 0 list) (nth 0 key-def))
-                                         (equal (nth 2 list) (nth 2 key-def)))
-                                    (progn
-                                      (setq found t)
-                                      list)))
-                              (nth 1 mode-list)))
-                   (unless found
-                     (add-to-list 'lst list))
-                   `(,(nth 0 mode-list) ,lst))))
-             ergoemacs-minor-mode-layout))))
-  
   (when (emacsmate-packge-load-path 'ergoemacs-mode)
     (require 'ergoemacs-mode)
     (ergoemacs-key "M-a" 'smex-if-exists "M-x")
     (ergoemacs-key "M-;" 'helm-mini "Helm")
+    (ergoemacs-key "M-m" 'org-capture "Capture")
+    (ergoemacs-key "M-M" 'org-agenda "Agenda")
     (ergoemacs-minor-key 'helm-before-initialize-hook `(,(ergoemacs-kbd "M-;" t) helm-keyboard-quit helm-map))
     ;; Swap ido keys so that up and down are next and previous match,
     ;; and left and right are history commands.
@@ -1088,6 +1080,146 @@ will load eshell only if helm is loaded
   (when (emacsmate-packge-load-path 'undo-tree)
     (require 'undo-tree)
     (global-undo-tree-mode))
+#+END_SRC
+
+** Mode Line Changes
+Based off of http://amitp.blogspot.com/2011/08/emacs-custom-mode-line.html
+#+BEGIN_SRC emacs-lisp
+  ;; Mode line setup
+  (when (emacsmate-packge-load-path 'powerline)
+    (require 'powerline)
+    ;; Extra mode line faces
+    (make-face 'mode-line-read-only-face)
+    (make-face 'mode-line-modified-face)
+    (make-face 'mode-line-folder-face)
+    (make-face 'mode-line-project-face)
+    (make-face 'mode-line-project-arrow-face)
+    (make-face 'mode-line-position-face)
+    (make-face 'mode-line-mode-face)
+    (make-face 'mode-line-minor-mode-face)
+    (make-face 'mode-line-process-face)
+    (make-face 'mode-line-80col-face)
+    (make-face 'mode-line-position-per-face)
+    
+    (set-face-attribute 'mode-line nil
+                        :foreground "gray60" :background "gray20"
+                        :inverse-video nil
+                        :box '(:line-width 6 :color "gray20" :style nil))
+    
+    (set-face-attribute 'mode-line-inactive nil
+                        :foreground "gray80" :background "gray40"
+                        :inverse-video nil
+                        :box '(:line-width 6 :color "gray40" :style nil))
+    
+    (set-face-attribute 'mode-line-read-only-face nil
+                        :inherit 'mode-line-face
+                        :foreground "#4271ae"
+                        :box '(:line-width 2 :color "#4271ae"))
+    (set-face-attribute 'mode-line-modified-face nil
+                        :inherit 'mode-line-face
+                        :foreground "#c82829"
+                        :background "#ffffff"
+                        :box '(:line-width 2 :color "#c82829"))
+  
+    (set-face-attribute 'mode-line-project-face nil
+                        :inherit 'mode-line-face
+                        :background "#eab700"
+                        :foreground "gray30")
+  
+    (set-face-attribute 'mode-line-position-per-face nil
+                        :inherit 'mode-line-project-face
+                        :height 110)
+  
+    (set-face-attribute 'mode-line-filename-face nil
+                        :inherit 'mode-line-face
+                        :foreground "#eab700"
+                        :background "gray30"
+                        :weight 'bold)
+  
+    (set-face-attribute 'mode-line-position-face nil
+                        :inherit 'mode-line-face
+                        :family "Menlo" :height 100)
+  
+    (set-face-attribute 'mode-line-mode-face nil
+                        :inherit 'mode-line-face
+                        :foreground "gray80")
+  
+    (set-face-attribute 'mode-line-minor-mode-face nil
+                        :inherit 'mode-line-mode-face
+                        :foreground "gray40"
+                        :height 110)
+  
+    (set-face-attribute 'mode-line-process-face nil
+                        :inherit 'mode-line-face
+                        :foreground "#718c00")
+  
+    (set-face-attribute 'mode-line-80col-face nil
+                        :inherit 'mode-line-position-face
+                        :foreground "#eab700"
+                        :background "gray20"
+                        :weight 'bold)
+    (setq-default
+     mode-line-format
+     '("%e"
+       (:eval
+        (let* ((active (eq (frame-selected-window) (selected-window)))
+               (face1 (if active 'powerline-active1 'powerline-inactive1))
+               (face2 (if active 'powerline-active2 'powerline-inactive2))
+               (lhs (list
+                     (powerline-raw "%*" (cond
+                                          (buffer-read-only
+                                           'mode-line-read-only-face)
+                                          ((buffer-modified-p)
+                                           'mode-line-modified-face)
+                                          (t nil)) 'l)
+                     (powerline-arrow-right (cond
+                                             (buffer-read-only
+                                              'mode-line-read-only-face)
+                                             ((buffer-modified-p)
+                                              'mode-line-modified-face)
+                                             (t nil)) 'mode-line-project-face)
+                     ;;(powerline-buffer-size nil 'l)
+                     (powerline-raw (concat (car (funcall tabbar-buffer-groups-function)) " ") 'mode-line-project-face 'l)
+                     
+                     (powerline-arrow-right 'mode-line-project-face 'mode-line-filename-face)
+                     
+                     (powerline-buffer-id 'mode-line-filename-face 'l)
+                     (powerline-raw " " 'mode-line-filename-face)
+                     (powerline-arrow-right  'mode-line-filename-face nil)
+                     
+                     (powerline-major-mode 'mode-line-face 'l)
+                     (powerline-raw " [" 'mode-line-minor-mode-face)
+                     (powerline-minor-modes 'mode-line-minor-mode-face nil)
+                     (powerline-raw "] " 'mode-line-minor-mode-face)
+                     (powerline-raw mode-line-process 'mode-line-minor-mode-face 'l)
+                     
+                     (powerline-narrow 'mode-line-face 'l)
+                     
+                     (powerline-arrow-right nil face2)
+                     
+                     (powerline-vc face2)))
+               (rhs (list
+                     (powerline-raw global-mode-string face2 'r)
+                     
+                     (powerline-arrow-left face2 nil)
+                     
+                     (powerline-raw "%4l" 'mode-line-position-face  'r)
+                     (powerline-raw ":" 'mode-line-position-face)
+                     (powerline-raw "%3c" (if (>= (current-column) 80)
+                                              'mode-line-80col-face
+                                            'mode-line-position-face) 'r)
+                     
+                     (powerline-arrow-left nil 'mode-line-project-face)
+                     (powerline-raw " " 'mode-line-project-face)
+                     
+                     (powerline-raw "%6p" 'mode-line-position-per-face 'r)
+                     
+                     (powerline-hud nil 'mode-line-project-face))))
+          (concat
+           (powerline-render lhs)
+           (powerline-fill face2 (powerline-width rhs))
+           (powerline-render rhs)))))))
+  
 #+END_SRC
 
 ** Misc Settings

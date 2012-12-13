@@ -1169,13 +1169,17 @@ Based off of http://amitp.blogspot.com/2011/08/emacs-custom-mode-line.html
                      (powerline-raw "%*" (cond
                                           (buffer-read-only
                                            'mode-line-read-only-face)
-                                          ((buffer-modified-p)
+                                          ((condition-case err
+                                               (buffer-modified-p)
+                                             (error nil))
                                            'mode-line-modified-face)
                                           (t nil)) 'l)
                      (powerline-arrow-right (cond
                                              (buffer-read-only
                                               'mode-line-read-only-face)
-                                             ((buffer-modified-p)
+                                             ((condition-case err
+                                                  (buffer-modified-p)
+                                                (error nil))
                                               'mode-line-modified-face)
                                              (t nil)) 'mode-line-project-face)
                      ;;(powerline-buffer-size nil 'l)

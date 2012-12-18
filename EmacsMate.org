@@ -216,8 +216,7 @@ This is based on my changing [[http://eschulte.me/emacs24-starter-kit/][Emacs St
 *** Required ELPA packages
 #+BEGIN_SRC emacs-lisp
   (defvar emacsmate-packages
-    '(
-      org-outlook
+    '(org-outlook
       auto-complete
       auto-indent-mode
       autopair
@@ -234,6 +233,7 @@ This is based on my changing [[http://eschulte.me/emacs24-starter-kit/][Emacs St
       ssh
       htmlize
       zenburn-theme
+      extend-dnd
       solarized-theme
       textmate-to-yas
       multiple-cursors
@@ -244,6 +244,8 @@ This is based on my changing [[http://eschulte.me/emacs24-starter-kit/][Emacs St
       projectile
       powerline
       diminish
+      header2
+      lib-requires
       tabbar-ruler)
     "Libraries that should be installed by default.")
   
@@ -592,21 +594,21 @@ To use CUA-type keys and others, I use:
     ;; and left and right are history commands.
     
     ;; This works with the ido hack to have a vertical display of choices.
-    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(forward-char ido-next-match-dir ido-file-dir-completion-map))
-    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(backward-char ido-prev-match-dir ido-file-dir-completion-map))
-    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<right>" ido-next-match-dir ido-file-dir-completion-map))
-    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<left>" ido-prev-match-dir ido-file-dir-completion-map))
+    ;; (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(forward-char ido-next-match-dir ido-file-dir-completion-map))
+    ;; (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(backward-char ido-prev-match-dir ido-file-dir-completion-map))
+    ;; (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<right>" ido-next-match-dir ido-file-dir-completion-map))
+    ;; (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<left>" ido-prev-match-dir ido-file-dir-completion-map))
     
-    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(forward-char ido-next-match-dir ido-file-completion-map))
-    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(backward-char ido-prev-match-dir ido-file-completion-map))
-    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<right>" ido-next-match-dir ido-file-completion-map))
-    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<left>" ido-prev-match-dir ido-file-completion-map))
+    ;; (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(forward-char ido-next-match-dir ido-file-completion-map))
+    ;; (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(backward-char ido-prev-match-dir ido-file-completion-map))
+    ;; (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<right>" ido-next-match-dir ido-file-completion-map))
+    ;; (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<left>" ido-prev-match-dir ido-file-completion-map))
     
     
-    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(previous-line ido-prev-match ido-common-completion-map))
-    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(next-line ido-next-match ido-common-completion-map))
-    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<up>" ido-prev-match ido-common-completion-map))
-    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<down>" ido-next-match ido-common-completion-map))
+    ;; (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(previous-line ido-prev-match ido-common-completion-map))
+    ;; (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(next-line ido-next-match ido-common-completion-map))
+    ;; (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<up>" ido-prev-match ido-common-completion-map))
+    ;; (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<down>" ido-next-match ido-common-completion-map))
     (require 'expand-region)
     (ergoemacs-key "M-8" 'er/expand-region
                    (format "%sregion%s"
@@ -804,11 +806,15 @@ This does the following:
 - Adds extra autopair groups.
 - Changes adaptive filling for lisp-style comments
 #+begin_src emacs-lisp
+  
   (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
   (add-hook 'emacs-lisp-mode-hook 'run-emacsmate-coding-hook)
   (add-hook 'emacs-lisp-mode-hook 'emacsmate-remove-elc-on-save)
   ;; (add-hook 'emacs-lisp-mode-hook 'idle-highlight)
   (define-key emacs-lisp-mode-map (kbd "C-c v") 'eval-buffer)
+  
+  
+  
   
   (defun emacsmate-remove-elc-on-save ()
     "If you're saving an elisp file, likely the .elc is no longer valid."
@@ -1082,6 +1088,14 @@ will load eshell only if helm is loaded
     (global-undo-tree-mode))
 #+END_SRC
 
+*** Extend Drag and Drop
+Drag and Drop Extend
+#+BEGIN_SRC emacs-lisp
+  (when (emacsmate-packge-load-path 'extend-dnd)
+    (require 'extend-dnd)
+    (extend-dnd-activate))
+#+END_SRC
+
 ** Mode Line Changes
 Based off of http://amitp.blogspot.com/2011/08/emacs-custom-mode-line.html
 #+BEGIN_SRC emacs-lisp
@@ -1100,64 +1114,69 @@ Based off of http://amitp.blogspot.com/2011/08/emacs-custom-mode-line.html
     (make-face 'mode-line-process-face)
     (make-face 'mode-line-80col-face)
     (make-face 'mode-line-position-per-face)
+    (make-face 'mode-line-filename-face)
     
-    (set-face-attribute 'mode-line nil
-                        :foreground "gray60" :background "gray20"
-                        :inverse-video nil
-                        :box '(:line-width 6 :color "gray20" :style nil))
+    (defun emacsmate-powerline-setup-faces (&optional frame)
+      "Set up of faces based on theme setting"
+      (interactive)
+      (set-face-attribute 'mode-line frame
+                          :foreground "gray60" :background "gray20"
+                          :inverse-video frame)
+      
+      (set-face-attribute 'mode-line-inactive frame
+                          :foreground "gray80" :background "gray40"
+                          :inverse-video frame)
+      
+      (set-face-attribute 'mode-line-read-only-face frame
+                          :inherit 'mode-line
+                          :foreground "#4271ae"
+                          :box '(:line-width 2 :color "#4271ae"))
+      (set-face-attribute 'mode-line-modified-face frame
+                          :inherit 'mode-line
+                          :foreground "#c82829"
+                          :background "#ffffff"
+                          :box '(:line-width 2 :color "#c82829"))
+      
+      (set-face-attribute 'mode-line-project-face frame
+                          :inherit 'mode-line-buffer-id
+                          :background (face-attribute 'mode-line-buffer-id :foreground)
+                          :foreground (face-attribute 'mode-line :background))
+      
+      (set-face-attribute 'mode-line-position-per-face frame
+                          :inherit 'mode-line-project-face
+                          :height 110)
+      
+      (set-face-attribute 'mode-line-filename-face frame
+                          :inherit 'mode-line-buffer-id
+                          :background (face-attribute 'mode-line-inactive :background)
+                          :weight 'bold)
+      
+      (set-face-attribute 'mode-line-position-face frame
+                          :inherit 'mode-line
+                          :height 100)
+      
+      (set-face-attribute 'mode-line-mode-face frame
+                          :inherit 'mode-line)
+      
+      (set-face-attribute 'mode-line-minor-mode-face frame
+                          :inherit 'mode-line-mode-face
+                          :foreground "gray40"
+                          :height 110)
+      
+      (set-face-attribute 'mode-line-process-face frame
+                          :inherit 'mode-line
+                          :foreground "#718c00")
+      
+      (set-face-attribute 'mode-line-80col-face frame
+                          :inherit 'mode-line-position-face
+                          :foreground "#eab700"
+                          :background "gray20"
+                          :weight 'bold))
     
-    (set-face-attribute 'mode-line-inactive nil
-                        :foreground "gray80" :background "gray40"
-                        :inverse-video nil
-                        :box '(:line-width 6 :color "gray40" :style nil))
-    
-    (set-face-attribute 'mode-line-read-only-face nil
-                        :inherit 'mode-line-face
-                        :foreground "#4271ae"
-                        :box '(:line-width 2 :color "#4271ae"))
-    (set-face-attribute 'mode-line-modified-face nil
-                        :inherit 'mode-line-face
-                        :foreground "#c82829"
-                        :background "#ffffff"
-                        :box '(:line-width 2 :color "#c82829"))
-  
-    (set-face-attribute 'mode-line-project-face nil
-                        :inherit 'mode-line-face
-                        :background "#eab700"
-                        :foreground "gray30")
-  
-    (set-face-attribute 'mode-line-position-per-face nil
-                        :inherit 'mode-line-project-face
-                        :height 110)
-  
-    (set-face-attribute 'mode-line-filename-face nil
-                        :inherit 'mode-line-face
-                        :foreground "#eab700"
-                        :background "gray30"
-                        :weight 'bold)
-  
-    (set-face-attribute 'mode-line-position-face nil
-                        :inherit 'mode-line-face
-                        :family "Menlo" :height 100)
-  
-    (set-face-attribute 'mode-line-mode-face nil
-                        :inherit 'mode-line-face
-                        :foreground "gray80")
-  
-    (set-face-attribute 'mode-line-minor-mode-face nil
-                        :inherit 'mode-line-mode-face
-                        :foreground "gray40"
-                        :height 110)
-  
-    (set-face-attribute 'mode-line-process-face nil
-                        :inherit 'mode-line-face
-                        :foreground "#718c00")
-  
-    (set-face-attribute 'mode-line-80col-face nil
-                        :inherit 'mode-line-position-face
-                        :foreground "#eab700"
-                        :background "gray20"
-                        :weight 'bold)
+    (defadvice load-theme (around EmacsMate-reset-powerline activate)
+      "Resets Powerline mode bar based on currently loaded theme."
+      ad-do-it
+      (emacsmate-powerline-setup-faces))
     (setq-default
      mode-line-format
      '("%e"
@@ -1165,39 +1184,44 @@ Based off of http://amitp.blogspot.com/2011/08/emacs-custom-mode-line.html
         (let* ((active (eq (frame-selected-window) (selected-window)))
                (face1 (if active 'powerline-active1 'powerline-inactive1))
                (face2 (if active 'powerline-active2 'powerline-inactive2))
+               (project (if active 'mode-line-project-face 'mode-line-inactive))
+               (filename (if active 'mode-line-filename-face 'mode-line-inactive))
+               (face3 (cond
+                       ((condition-case err
+                            (buffer-read-only)
+                          (error nil))
+                        'mode-line-read-only-face)
+                       ((condition-case err
+                            (buffer-modified-p)
+                          (error nil))
+                        'mode-line-modified-face)
+                       (t nil)))
                (lhs (list
-                     (powerline-raw "%*" (cond
-                                          (buffer-read-only
-                                           'mode-line-read-only-face)
-                                          ((condition-case err
-                                               (buffer-modified-p)
-                                             (error nil))
-                                           'mode-line-modified-face)
-                                          (t nil)) 'l)
-                     (powerline-arrow-right (cond
-                                             (buffer-read-only
-                                              'mode-line-read-only-face)
-                                             ((condition-case err
-                                                  (buffer-modified-p)
-                                                (error nil))
-                                              'mode-line-modified-face)
-                                             (t nil)) 'mode-line-project-face)
-                     ;;(powerline-buffer-size nil 'l)
-                     (powerline-raw (concat (car (funcall tabbar-buffer-groups-function)) " ") 'mode-line-project-face 'l)
+                     ;;(powerline-buffer-size face3 'l)
+                     (powerline-raw "%*"  face3 'l)
                      
-                     (powerline-arrow-right 'mode-line-project-face 'mode-line-filename-face)
+                     (powerline-arrow-right face3 project)
+                     (powerline-raw (condition-case err
+                                        (concat (car (funcall tabbar-buffer-groups-function)) " ")
+                                      (error "Error ")) project 'l)
                      
-                     (powerline-buffer-id 'mode-line-filename-face 'l)
+                     (if active
+                         (powerline-arrow-right 'mode-line-project-face 'mode-line-filename-face)
+                       (powerline-raw ">" 'mode-line-inactive))
+                     
+                     (powerline-buffer-id filename 'l)
                      (powerline-raw " " 'mode-line-filename-face)
-                     (powerline-arrow-right  'mode-line-filename-face nil)
+                     (if active
+                         (powerline-arrow-right  'mode-line-filename-face nil)
+                       (powerline-raw ">" 'mode-line-inactive))
                      
-                     (powerline-major-mode 'mode-line-face 'l)
-                     (powerline-raw " [" 'mode-line-minor-mode-face)
-                     (powerline-minor-modes 'mode-line-minor-mode-face nil)
-                     (powerline-raw "] " 'mode-line-minor-mode-face)
-                     (powerline-raw mode-line-process 'mode-line-minor-mode-face 'l)
+                     (powerline-major-mode (if active 'mode-line 'mode-line-inactive) 'l)
+                     (powerline-raw " [" (if active 'mode-line-minor-mode-face 'mode-line-inactive))
+                     (powerline-minor-modes (if active 'mode-line-minor-mode-face 'mode-line-inactive) nil)
+                     (powerline-raw "] " (if active 'mode-line-minor-mode-face 'mode-line-inactive))
+                     (powerline-raw mode-line-process (if active 'mode-line-minor-mode-face 'mode-line-inactive) 'l)
                      
-                     (powerline-narrow 'mode-line-face 'l)
+                     (powerline-narrow (if active 'mode-line-minor-mode-face 'mode-line-inactive) 'l)
                      
                      (powerline-arrow-right nil face2)
                      
@@ -1207,11 +1231,11 @@ Based off of http://amitp.blogspot.com/2011/08/emacs-custom-mode-line.html
                      
                      (powerline-arrow-left face2 nil)
                      
-                     (powerline-raw "%4l" 'mode-line-position-face  'r)
-                     (powerline-raw ":" 'mode-line-position-face)
+                     (powerline-raw "%4l" (if active 'mode-line-position-face 'mode-line-inactive)  'r)
+                     (powerline-raw ":" (if active 'mode-line-position-face 'mode-line-inactive))
                      (powerline-raw "%3c" (if (>= (current-column) 80)
-                                              'mode-line-80col-face
-                                            'mode-line-position-face) 'r)
+                                              (if active 'mode-line-80col-face 'mode-line-inactive)
+                                            (if active 'mode-line-position-face 'mode-line-inactive)) 'r)
                      
                      (powerline-arrow-left nil 'mode-line-project-face)
                      (powerline-raw " " 'mode-line-project-face)
@@ -1225,6 +1249,8 @@ Based off of http://amitp.blogspot.com/2011/08/emacs-custom-mode-line.html
            (powerline-render rhs)))))))
   
 #+END_SRC
+
+#+RESULTS:
 
 ** Misc Settings
 *** Window systems Settings

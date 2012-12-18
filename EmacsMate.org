@@ -1,0 +1,1417 @@
+#+TITLE: EmacsMate
+#+AUTHOR: Matthew L. Fidler
+* Introduction
+[[http://manual.macromates.com/en/][TextMate]] is a popular editor for Mac OS X.  I don't believe it can be
+configured as much as emacs, but some of the features are fairly
+intuitive.  Emacs can replicate much of the textmate functionality.
+This is a literate startup file based on Emacs Capabilities that do
+the same thing as textmate.
+* Project Management
+Project management is not built into emacs.  There are a few different
+project management tools for emacs:
+- [[https://github.com/bbatsov/projectile][Projectile]]
+- [[http://stackoverflow.com/questions/978984/is-there-a-good-emacs-project-management-somewhere][Is there a good Emacs project management somewhere? ]]
+- [[http://misspent.wordpress.com/2011/05/31/eproject-anything-simple-emacs-project-management/][eproject + anything: simple emacs project management]].
+
+I have implemented projectile support because it has some support for
+version control-based projects.
+
+** Creating Projects
+Projects with projectile are created from github, bzr, etc
+repositories are automatically considered projects.
+** Filtering Unwanted files
+Unwanted files are filtered with a =.projectile= file.
+** Navigating files in a project
+When files are opened, the tabbar groups them by Projectile Project.
+** Find and Replace in Projects
+This can be accessed in the Projectile menu or keybindings.
+** Moving between project files
+
+** Using Helm
+
+* Key Bindings
+Typically TextMate uses [[http://www.emacswiki.org/CuaMode][Cua Mode]].  This does not provide all the
+traditional key bindings, so I also use [[http://ergoemacs.org/emacs/ergonomic_emacs_keybinding.html][ErgoEmacs Keybindings]]. This
+doesn't quite work with org-mode, so as a hack, I have devised
+[[https://github.com/mlf176f2/org-cua-dwim.el][org-cua-dwim.el]].                
+* Templates
+Textmate implements templates on creating a new file, see
+[[http://manual.macromates.com/en/templates][TextMate Manual » Templates]].  Currently, the new file templates are
+unimplemented. 
+* Printing
+:PROPERTIES:
+:ID: 67b9db54-665d-408b-b156-0377eaf884c2
+:END:
+Printing in Emacs are discussed in the following places:
+- [[http://www.emacswiki.org/emacs/PrintingFromEmacs][EmacsWiki: Printing From Emacs]]
+
+Under windows:
+
+- [[http://www.leedberg.com/2005/11/how-to-printing-in-emacs-under-windows.html][Leedberg.com: How-To: Printing in Emacs Under Windows]]
+- [[http://stackoverflow.com/questions/569758/how-do-i-print-from-emacs-on-win32][winapi - How do I print from Emacs on Win32? - Stack Overflow]]
+- [[http://www.gnu.org/software/emacs/manual/html_node/emacs/Windows-Printing.html#Windows-Printing][Windows Printing - GNU Emacs Manual]]
+- [[http://gregorygrubbs.com/emacs/10-tips-emacs-windows/][10 Tips for Powerful Emacs on Windows]]
+
+This is implemented in the [[id:3484edff-15e3-47d5-85e5-76251d4b8776][Printing]] section.
+
+* Bookmarks
+:PROPERTIES:
+:ID: 99a99dfe-41b6-40ec-ae8e-44d2a3d8ae81
+:END:
+Bookmarks are implemented in Emacs, see [[http://www.gnu.org/software/emacs/manual/html_node/emacs/Bookmarks.html][GNU Emacs Manual]].  
+Other discussions for bookmarks are located at:
+- [[http://emacswiki.org/emacs/BookMarks][EmacsWiki: Book-marks]]
+- [[http://ergoemacs.org/emacs/bookmark.html][Using Emacs's Bookmark Feature]]
+- [[http://emacs-fu.blogspot.com/2009/11/bookmarks.html][emacs-fu: bookmarks]]
+- [[http://emacsblog.org/2007/03/22/bookmark-mania/][Bookmark Mania | M-x all-things-emacs]]
+
+Like anything in emacs, you can extend bookmarks, see:
+- [[http://cedet.sourceforge.net/visbookmark.shtml][EIEIO Visual Studio style bookmarks]]
+- [[http://www.emacswiki.org/emacs/BookmarkPlus#Bookmark%252b][Bookmark Plus]]
+- [[http://www.emacswiki.org/emacs/BreadcrumbForEmacs][Breadcrumb For Emacs]]
+- [[http://www.emacswiki.org/emacs/EshellBmk][Eshell Bmk]]
+- [[http://www.emacswiki.org/emacs/GraphicalBookmarkJump][Graphical Bookmark Jump]]
+- [[http://www.emacswiki.org/emacs/VisibleBookmarks][Visible Bookmarks]]
+- [[http://www.emacswiki.org/emacs/wuxch-bookmark.el][wuxch-bookmark.el]]
+- [[https://github.com/joodland/bm][Visible bookmarks in buffer (joodland/bm)]]
+
+TextMate uses a visual-studio style bookmarks (See [[http://manual.macromates.com/en/navigation_overview][TextMate Manual »
+Navigation / Overview]]).  Therefore to duplicate both textmate's
+behavior and visual studio's behavior there are two options:
+- [[https://github.com/joodland/bm][Visible bookmarks in buffer (joodland/bm)]]
+- [[http://cedet.sourceforge.net/visbookmark.shtml][EIEIO Visual Studio style bookmarks]]
+
+I choose the Visible bookmarks in buffers because it not only adds
+visual studio style bookmarks, but also shows a visual cue of where
+these bookmarks are.
+
+The Keyboard bindings for the bookmarks are:
+
+|------------+-------------------|
+| Key        | Action            |
+|------------+-------------------|
+| Control-F2 | Toggle Bookmarks  |
+| F2         | Next Bookmark     |
+| Shift-F2   | Previous Bookmark |
+|------------+-------------------|
+
+This is setup in [[id:2c39ce29-8541-4cd3-9715-ec0f0d368eb1][Bookmarks]], below
+
+* Collapsing Text Blocks 
+Hide-Show collapses text blocks.  I implement hideshowvis to implement
+collapsing of blocks
+* Code Navigation
+** Customizing
+* Working with Text
+** Auto-paired characters
+TextMate Handles autopaired characters as follows:
+[[http://manual.macromates.com/en/working_with_text#auto-paired_characters_quotes_etc][TextMate Manual - Working With Text - Auto-Paired Characters]]
+This is implemented by autopair-mode
+** Code Completion
+
+** Copy and Paste
+
+** Moving Text
+*** Increase/Decrease Indent Level
+
+*** Move Text Up/Down/Left/Right
+
+*** Re-indent-text
+
+** Selecting Text
+*** Editing Multiple Lines
+** Smart Tab
+
+** Spell Checking
+
+* Modes
+* Snippets
+** Importing Textmate bundles
+* Shell Commands
+* Drag Commands
+* Themes
+* Working with Version Control
+* Macros
+* Regular Expressions
+* Calling Emacs from other applications
+See [[http://manual.macromates.com/en/using_textmate_from_terminal.html][Calling TextMate from Other Applications]]
+** Browsers
+*** Chromium/Chrome
+Type Control-Shift-B.  Add a bookmark.  The name should be Org Capture
+
+The web address should be:
+#+BEGIN_SRC js
+  javascript:location.href='org-protocol://capture://'+encodeURIComponent(location.href)+'/'+encodeURIComponent(document.title)+'/'+encodeURIComponent(window.getSelection()).replace(/'/g,"%27").replace(/\(/g,"%28").replace(/\)/g,"%29")javascript:location.href='org-protocol://capture://'+encodeURIComponent(location.href)+'/'+encodeURIComponent(document.title)+'/'+encodeURIComponent(window.getSelection()).replace(/'/g,"%27").replace(/\(/g,"%28").replace(/\)/g,"%29")
+#+END_SRC
+
+You could also set the sub-protocol in the capture dialog.  To use the
+org-protocol template included in EmacsMate, use:
+
+#+BEGIN_SRC js
+  javascript:location.href='org-protocol://capture://w/'+encodeURIComponent(location.href)+'/'+encodeURIComponent(document.title)+'/'+encodeURIComponent(window.getSelection()).replace(/'/g,"%27").replace(/\(/g,"%28").replace(/\)/g,"%29")javascript:location.href='org-protocol://capture://'+encodeURIComponent(location.href)+'/'+encodeURIComponent(document.title)+'/'+encodeURIComponent(window.getSelection()).replace(/'/g,"%27").replace(/\(/g,"%28").replace(/\)/g,"%29")
+#+END_SRC
+
+
+Add another bookmark the name should be Org Store Link
+
+The web address should be:
+#+BEGIN_SRC js
+  javascript:location.href='org-protocol://store-link://'+encodeURIComponent(location.href)+'/'+encodeURIComponent(document.title)
+#+END_SRC
+
+You could also make this bound to key by using Google Chrome's
+Shortcut Manager.
+
+
+** Shell
+
+** Editor
+
+** TeX Editor
+** From Less
+* Customizing Emacs More
+* Getting Help
+* Implementation
+This is based on my changing [[http://eschulte.me/emacs24-starter-kit/][Emacs Starter Kit]] and [[http://batsov.com/prelude/][Prelude]]
+** Declaring functions that are unknown to compilers
+#+BEGIN_SRC emacs-lisp
+  (declare-function ergoemacs-kbd "ergoemacs-mode")
+  (declare-function ergoemacs-setup-keys "ergoemacs-mode")
+  (declare-function ergoemacs-mode "ergoemacs-mode")
+  (declare-function org-cua-dwim-activate "org-cua-dwim")
+  
+  (declare-function autopair-global-mode "autopair")
+  
+  (declare-function ac-config-default "auto-complete-config")
+  
+  (declare-function pos-tip-w32-max-width-height "pos-tip")
+  
+  (declare-function ido-ubiquitous "ido-ubiquitous")
+  
+  (declare-function yas-global-mode "yasnippet")
+  (declare-function yas-load-directory "yasnippet")
+  (declare-function yas-expand "yasnippet")
+  
+  (declare-function ssh "ssh")
+  
+  (declare-function global-undo-tree-mode "undo-tree")
+  
+  (declare-function projectile-global-mode "projectile")
+  (declare-function projectile-project-root "projectile")
+  (declare-function projectile-project-name "projectile")
+  
+  (declare-function package-installed-p "package")
+  (declare-function package-version-join "package")
+  (declare-function package-desc-vers "package")
+  (declare-function package--dir "package")
+#+END_SRC
+
+** Functions and Customization Groups
+*** Customizable group
+#+BEGIN_SRC emacs-lisp
+  (defgroup emacsmate nil
+    "EmacsMate Customization Options"
+    :group 'emacs)
+#+END_SRC
+*** Required ELPA packages
+#+BEGIN_SRC emacs-lisp
+  (defvar emacsmate-packages
+    '(
+      org-outlook
+      auto-complete
+      auto-indent-mode
+      autopair
+      ergoemacs-mode
+      helm
+      undo-tree
+      ido-ubiquitous
+      melpa
+      org-cua-dwim
+      org-table-comment
+      pos-tip
+      smex
+      yasnippet
+      ssh
+      htmlize
+      zenburn-theme
+      solarized-theme
+      textmate-to-yas
+      multiple-cursors
+      expand-region
+      dired+
+      info+
+      linum-off
+      projectile
+      powerline
+      diminish
+      tabbar-ruler)
+    "Libraries that should be installed by default.")
+  
+#+END_SRC
+
+*** ELPA functions
+#+BEGIN_SRC emacs-lisp
+  (defun emacsmate-packages-installed-p ()
+    "Are the emacsmate packages installed.  Lifted from emacs prelude."
+    (loop for p in emacsmate-packages
+          when (not (package-installed-p p)) do (return nil)
+          finally (return t)))
+  
+  (defun emacsmate-package-dir (package)
+    "Determines the package directory for PACKAGE"
+    (let ((pkg-vec (cdr (assq package package-alist)))
+          available-version found)
+      ;; Check if PACKAGE is available in `package-alist'.
+      (when pkg-vec
+        (setq available-version (package-version-join (package-desc-vers pkg-vec)))
+        (setq found (package--dir (symbol-name package) (format "%s" available-version))))
+      (symbol-value 'found)))
+  
+  (defun emacsmate-packge-load-path (package &optional subdirs)
+    "Adds PACKAGE to the load path.  Optionally add subdirectories (SUBDIRS)"
+    (let ((default-directory (emacsmate-package-dir package)))
+      (when default-directory
+        (if (not subdirs)
+            (add-to-list 'load-path (emacsmate-package-dir package))
+          (normal-top-level-add-subdirs-to-load-path)))
+      (symbol-value 'default-directory)))
+#+END_SRC
+*** The emacsmate-coding-hook:
+A single hook holding those functions which should be run in *every*
+code buffer.
+
+We have a number of turn-on-* functions since it's advised that lambda
+functions not go in hooks. Repeatedly evaling an add-to-list with a
+hook value will repeatedly add it since there's no way to ensure that
+a lambda doesn't already exist in the list.
+
+#+srcname: emacsmate-hook-functions
+#+begin_src emacs-lisp
+  (defun emacsmate-local-column-number-mode ()
+    (make-local-variable 'column-number-mode)
+    (column-number-mode t))
+  
+  (defun emacsmate-local-comment-auto-fill ()
+    (set (make-local-variable 'comment-auto-fill-only-comments) t)
+    (auto-fill-mode t))
+  
+  (defvar save-place nil)
+  (defun emacsmate-turn-on-save-place-mode ()
+    (setq save-place t))
+  
+  (defun emacsmate-turn-on-whitespace ()
+    (whitespace-mode t))
+  
+  
+  (defun emacsmate-turn-on-flyspell-prog-mode ()
+    (flyspell-prog-mode))
+  
+  (defun emacsmate-turn-on-org-table-comment-mode ()
+    (when (fboundp 'org-table-comment-mode)
+      (org-table-comment-mode 1)))
+  
+#+end_src
+
+#+srcname: emacsmate-add-local-column-number-mode
+#+begin_src emacs-lisp
+(add-hook 'emacsmate-coding-hook 'emacsmate-local-column-number-mode)
+#+end_src
+
+#+srcname: start-kit-add-local-comment-auto-fill
+#+begin_src emacs-lisp
+(add-hook 'emacsmate-coding-hook 'emacsmate-local-comment-auto-fill)
+#+end_src
+
+#+begin_src emacs-lisp
+  (defun emacsmate-pretty-lambdas ()
+    (font-lock-add-keywords
+     nil `(("(\\(lambda\\>\\)"
+            (0 (progn (compose-region (match-beginning 1) (match-end 1)
+                                      ,(make-char 'greek-iso8859-7 107))
+                      nil))))))
+#+end_src
+
+#+srcname: emacsmate-add-pretty-lambdas
+#+begin_src emacs-lisp
+  (when (window-system)
+    (add-hook 'emacsmate-coding-hook 'emacsmate-pretty-lambdas))
+#+end_src
+
+#+srcname: emacsmate-add-flyspell-prog-mode
+#+begin_src emacs-lisp
+  (add-hook 'emacsmate-coding-hook 'emacsmate-turn-on-flyspell-prog-mode)
+#+end_src
+
+#+srcname: emacsmate-run-emacsmate-coding-hook
+#+begin_src emacs-lisp
+(defun run-emacsmate-coding-hook ()
+  "Enable things that are convenient across all coding buffers."
+  (run-hooks 'emacsmate-coding-hook))
+#+end_src
+** Load Path, etc
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'load-path emacsmate-dir)
+  (defvar autoload-file (concat emacsmate-dir "loaddefs.el")
+    "EmacsMate autoload file")
+  (require 'package)
+  (when (boundp 'package-user-dir)
+    (setq package-user-dir (concat emacsmate-dir "elpa")))
+  
+  (setq custom-file (concat emacsmate-dir "custom.el"))
+#+END_SRC
+** Ubiquitous Packages
+#+BEGIN_SRC emacs-lisp
+  (require 'package)
+  (with-no-warnings
+    (require 'cl))
+  (require 'saveplace)
+  (require 'ffap)
+  (require 'uniquify)
+  (require 'ansi-color)
+  (require 'recentf)
+#+END_SRC
+
+** Setting up ELPA
+#+BEGIN_SRC emacs-lisp
+  (setq package-archives
+        '(("original"    . "http://tromey.com/elpa/")
+          ("gnu"         . "http://elpa.gnu.org/packages/")
+          ("marmalade"   . "http://marmalade-repo.org/packages/")
+          ("melpa"       . "http://melpa.milkbox.net/packages/")))
+  (package-initialize)
+  (unless (emacsmate-packages-installed-p)
+    (package-refresh-contents)
+    (dolist (package emacsmate-packages)
+      (message "Installing Package %s" package)
+      (unless (package-installed-p package)
+        (package-install package))))
+#+END_SRC
+** OS X bug
+#+BEGIN_SRC emacs-lisp
+(if (eq system-type 'darwin)
+    (setq system-name (car (split-string system-name "\\."))))
+#+END_SRC
+** Auto-install
+Instead of requiring that you use all the features, the features are
+set up as you go using emacs lisp package archive.  The following
+macro allows auto-installing of modes or packages:
+#+BEGIN_SRC emacs-lisp
+  (defmacro autoinstall (function package &optional docstring file)
+    "Macro for auto-installing/auto-loading a particular package.
+    FUNCTION is the function name
+    PACKAGE is the package name
+    DOCSTRING is the documentation string
+    FILE is the file name of the load path"
+    `(let ((fn ,file))       (if fn
+           (progn
+             (if (not (file-exists-p fn))
+                 (unless (file-exists-p (concat fn ".el"))
+                   (setq fn (format "%s/%s" (emacsmate-package-dir ',package) fn))
+                   (if (not (file-exists-p fn))
+                       (unless (file-exists-p (concat fn ".el"))
+                         (setq fn nil)))))))
+       (unless fn
+         (setq fn (format "%s/%s" (emacsmate-package-dir ',package)
+                          (symbol-name ',package)))
+         (unless (file-exists-p (concat fn ".el"))
+           (setq fn (format "%s/%s" (emacsmate-package-dir ',package)
+                            (symbol-name ',function)))
+           (unless (file-exists-p (concat fn ".el"))
+             (setq fn nil))))
+       (if (and fn (package-installed-p ',package))
+           (progn
+             (unless (or (fboundp ',function) (boundp ',function))
+               (autoload ',function fn ,(or docstring
+                                            (format "Install `%s' using package `%s'"
+                                                    function package)) t))
+             (if (file-exists-p (expand-file-name
+                                 (format "EmacsMate-%s.org" (symbol-name ',package))
+                                 emacsmate-dir))
+                 (eval-after-load fn
+                   (emacsmate-load-org (expand-file-name
+                                        (format "EmacsMate-%s.org" (symbol-name ',package))
+                                        emacsmate-dir))) nil))
+         (defun ,function nil
+           ,(concat (or docstring
+                        (format "Install `%s' using package `%s'"
+                                function package)) " (To be Installed)")
+           (interactive)
+           (unless (package-installed-p ',package)
+             (package-install ',package))
+           (if (file-exists-p (expand-file-name
+                               (format "EmacsMate-%s.org" (symbol-name ',package))
+                               emacsmate-dir))
+               (emacsmate-load-org (expand-file-name
+                                    (format "EmacsMate-%s.org" (symbol-name ',package))
+                                    emacsmate-dir)))
+           (call-interactively ',function)))))
+  
+  (defmacro autoinstall-ext (ext function package &optional docstring file)
+    "Macro for auto-installing/auto-loading a particular package for a mode.
+    EXT is the extension regular expression
+    FUNCTION is the function name
+    PACKAGE is the package name
+    DOCSTRING is the documentation string
+    FILE is the file name of the load path"
+    `(progn
+       (autoinstall ,function ,package ,docstring ,file)
+       (add-to-list 'auto-mode-alist '(,ext . ,function))))
+  
+  (defvar emacsmate-autoinstall-extensions nil
+    "Autoinstalled modes")
+  (setq emacsmate-autoinstall-extensions
+        '(("\\.[qsS]\\'" S-mode ess "lisp/ess-site")
+          ("\\.[Rr]\\'" R-mode ess "lisp/ess-site")
+          ("\\.[Rr][Dd]\\'" Rd-mode ess "lisp/ess-site")
+          ("\\.[Ss][Aa][Ss]\\'" sas-mode ess "lisp/ess-site")
+          ("\\.[Ss][Tt][Aa][Tt][Aa]\\'"  stata-mode ess "lisp/ess-site")
+          ("\\.[RrSs][Nn][Ww]\\'" Rnw-mode ess "lisp/ess-site")
+          ("\\.[Nn][Ss][Ii]\\'" nsis-mode nsis-mode)
+          ("\\.[Mm][Uu][Ss][Ee]\\'" muse-mode muse)
+          ("\\.[Uu][Mm][Ll]\\'" plantuml-mode plantuml-mode)
+          ("\\.[Nn][Ss][Hh]\\'" nsis-mode nsis-mode)
+          ("\\.[Pp][Hh][Pp]\\'" php-mode php-mode)
+          ;; Visual Basic Mode
+          ;; Csharp mode
+          ("\\.[Cc][Ss]\\'" csharp-mode csharp-mode)
+          ("\\.[Pp][Ss]1\\'" powershell-mode powershell-mode)
+          ;; ntcmd mode
+          ("\\.[Bb][Aa][Tt]\\'" ntcmd-mode ntcmd)
+          ;; Autohotkey
+          ;;
+          ("\\.[Pp][Oo][Vv]\\'"  pov-mode pov-mode)
+          ("\\.[Mm][Ll][iIYyLlPp]?\\'" tuareg-mode tuareg)
+          
+          ;;()
+          ))
+  ;; Powershell
+  
+  (defvar emacsmate-autoinstall-packages nil
+    "Autoinstalled packages")
+  
+  (setq emacsmate-autoinstall-packages
+        '((magit-status magit)
+          (dictionary-search dictionary)
+          (dictionary-match-words dictionary)
+          (dictionary-lookup-definition dictionary)
+          (dictionary dictionary)
+          (dictionary-mous-popup-matching-words dictionary)
+          (dictionary-popup-matching-words dictionary)
+          (dictionary-tooltip-mode dictionary)
+          (global-dictionary-tooltip-mode)
+          (camldebug tuareg)
+          (powershell powershell)
+          (org-readme-sync org-readme)
+          (textmate-to-yas textmate-to-yas)
+          (R ess "lisp/ess-site")))
+  (mapc
+   (lambda(package)
+     (condition-case err
+         (progn
+           (message "%s" (macroexpand `(autoinstall ,(nth 0 package) ,(nth 1 package) nil ,(nth 2 package))))
+           (eval (macroexpand `(autoinstall ,(nth 0 package) ,(nth 1 package) nil ,(nth 2 package)))))
+       (error (message "Error loading %s: %s" package err))))
+   emacsmate-autoinstall-packages)
+  
+  (mapc
+   (lambda(package)
+     (condition-case err
+         (eval (macroexpand `(autoinstall-ext ,(nth 0 package) ,(nth 1 package)
+                                              ,(nth 2 package) nil ,(nth 3 package))))
+       (error (message "Error loading %s: %s" package err))))
+   emacsmate-autoinstall-extensions)
+  
+  ;;(message "%s" (macroexpand '(autoinstall magit-status magit)))
+  
+#+END_SRC
+** Printing
+:PROPERTIES:
+:ID: 3484edff-15e3-47d5-85e5-76251d4b8776
+:END:
+This implements printing assuming:
+- gtklp is installed and accessible or
+- GSView/Ghostrcript is installed and accessible.
+#+BEGIN_SRC emacs-lisp
+  (defcustom emacsmate-paper-size "letter"
+    "Paper size for Emacs Printing"
+    :type 'string
+    :group 'emacsmate)
+  (with-no-warnings
+    (if (executable-find "gtklp")
+        (progn
+          (setq ps-lpr-command (executable-find "gtklp")))
+      (let ((gsprint (and (getenv "ProgramFiles")
+                          (if (file-exists-p (format "%s/Ghostgum/gsview/gsprint.exe"
+                                                     (getenv "ProgramFiles")))
+                              (format "%s/Ghostgum/gsview/gsprint.exe"
+                                      (getenv "ProgramFiles"))
+                            nil))))
+        (if (or gsprint (executable-find "gsprint"))
+            (progn
+              (setq-default ps-lpr-command (or gsprint (executable-find "gsprint")))
+              (setq-default ps-printer-name t)
+              (setq-default ps-printer-name-option nil)
+              (setq ps-lpr-switches '("-query")) ; show printer dialog
+              (setq ps-right-header '("/pagenumberstring load" ps-time-stamp-mon-dd-yyyy)))
+          (when (executable-find "gswin32c")
+            (setq ps-printer-name t)
+            (setq ps-lpr-command (executable-find "gswin32c"))
+            (setq ps-lpr-switches `("-q" "-dNOPAUSE" "-dBATCH"
+                                    "-sDEVICE=mswinpr2"
+                                    ,(format "-sPAPERSIZE=%s" emacsmate-paper-size))))))))
+#+END_SRC
+** Coding Hook
+
+** Customize Settings
+#+BEGIN_SRC emacs-lisp
+(load custom-file 'noerror)
+#+END_SRC
+** Key Bindings
+To use CUA-type keys and others, I use:
+- Ergoemacs-key bingings, plus a bit extra
+- CUA-mode
+- org-cua-dwim to use CUA keys in org-mode.
+- Smex
+
+#+BEGIN_SRC emacs-lisp
+  (autoload 'log-edit-mode "log-edit" "" t)
+  (defun smex-if-exists (&optional prefix-arg)
+    (interactive "p")
+    (if (fboundp 'smex)
+        (smex)
+      (execute-extended-command prefix-arg)))
+  
+  (when (emacsmate-packge-load-path 'ergoemacs-mode)
+    (require 'ergoemacs-mode)
+    (ergoemacs-key "M-a" 'smex-if-exists "M-x")
+    (ergoemacs-key "M-;" 'helm-mini "Helm")
+    (ergoemacs-key "M-m" 'org-capture "Capture")
+    (ergoemacs-key "M-M" 'org-agenda "Agenda")
+    (ergoemacs-minor-key 'helm-before-initialize-hook `(,(ergoemacs-kbd "M-;" t) helm-keyboard-quit helm-map))
+    ;; Swap ido keys so that up and down are next and previous match,
+    ;; and left and right are history commands.
+    
+    ;; This works with the ido hack to have a vertical display of choices.
+    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(forward-char ido-next-match-dir ido-file-dir-completion-map))
+    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(backward-char ido-prev-match-dir ido-file-dir-completion-map))
+    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<right>" ido-next-match-dir ido-file-dir-completion-map))
+    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<left>" ido-prev-match-dir ido-file-dir-completion-map))
+    
+    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(forward-char ido-next-match-dir ido-file-completion-map))
+    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(backward-char ido-prev-match-dir ido-file-completion-map))
+    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<right>" ido-next-match-dir ido-file-completion-map))
+    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<left>" ido-prev-match-dir ido-file-completion-map))
+    
+    
+    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(previous-line ido-prev-match ido-common-completion-map))
+    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(next-line ido-next-match ido-common-completion-map))
+    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<up>" ido-prev-match ido-common-completion-map))
+    (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<down>" ido-next-match ido-common-completion-map))
+    (require 'expand-region)
+    (ergoemacs-key "M-8" 'er/expand-region
+                   (format "%sregion%s"
+                           (make-string 1 8592)
+                           (make-string 1 8594)))
+    
+    (ergoemacs-key "M-9" 'er/contract-region
+                   (format "%sregion%s"
+                           (make-string 1 8594)
+                           (make-string 1 8592)))
+    (when (boundp 'expand-region-contract-fast-key)
+      (setq expand-region-contract-fast-key (ergoemacs-kbd "7" t)))
+    (when (boundp 'expand-region-reset-fast-key)
+      (setq expand-region-reset-fast-key (ergoemacs-kbd "9" t)))
+    (require 'multiple-cursors)
+    (ergoemacs-key "M-*" 'mc/mark-next-like-this "Mark Next")
+    (ergoemacs-key "M-n" 'mc/edit-lines "Edit Lines")
+    (ergoemacs-setup-keys)
+    (ergoemacs-mode 1)
+    ;;
+    (global-set-key "\C-x\C-c" 'ignore)
+    (global-set-key (kbd "C-M-S-Q") 'save-buffers-kill-emacs))
+  (cua-mode) 
+  (org-cua-dwim-activate)
+  
+#+END_SRC
+*** Additional Key Bindings
+Help should allow apropos binding
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-h a") 'apropos)
+#+END_SRC
+
+** Popup right click menu from ergoemacs
+This is the popup menu taken from ErgoEmacs
+#+BEGIN_SRC emacs-lisp
+  ;; Mouse wheel behavior
+  (global-set-key [C-wheel-up] 'text-scale-increase)
+  (global-set-key [C-wheel-down] 'text-scale-decrease)
+  (global-set-key [C-down-mouse-2] 'text-scale-normal-size)
+  
+  ;; Right-click opens the context menu
+  (global-set-key [mouse-3] 'emacsmate-context-menu)
+  
+  (defvar edit-popup-menu
+    '(keymap
+      (undo menu-item "Undo" undo
+            :enable (and
+                     (not buffer-read-only)
+                     (not
+                      (eq t buffer-undo-list))
+                     (if
+                         (eq last-command 'undo)
+                         (listp pending-undo-list)
+                       (consp buffer-undo-list)))
+            :help "Undo last operation"
+            :keys "Ctrl+Z")
+      (separator-undo menu-item "--")
+      (cut menu-item "Cut" clipboard-kill-region
+           :help "Delete text in region and copy it to the clipboard"
+           :keys "Ctrl+X")
+      (copy menu-item "Copy" clipboard-kill-ring-save
+            :help "Copy text in region to the clipboard"
+            :keys "Ctrl+C")
+      (paste menu-item "Paste" clipboard-yank
+             :help "Paste text from clipboard"
+             :keys "Ctrl+V")
+      (paste-from-menu menu-item "Paste from Kill Menu" yank-menu
+                       :enable (and
+                                (cdr yank-menu)
+                                (not buffer-read-only))
+                       :help "Choose a string from the kill ring and paste it")
+      (clear menu-item "Clear" delete-region 
+             :enable (and mark-active (not buffer-read-only))
+             :help "Delete the text in region between mark and current position"
+             :keys "Del")
+      (separator-select-all menu-item "--")
+      (mark-whole-buffer menu-item "Select All" mark-whole-buffer
+                         :help "Mark the whole buffer for a subsequent cut/copy")))
+  
+  (defun emacsmate-context-menu (event)
+    "Pop up a context menu."
+    (interactive "e")
+    (popup-menu edit-popup-menu))
+  
+    
+#+END_SRC
+** Default Package/Modes Setup
+*** Autopair
+Autopair mode allows parenthesis auto-pairing to occur for all modes
+not just list like paredit.  See [[http://www.emacswiki.org/emacs/AutoPairs#toc3][EmacsWiki: Auto Pairs]].
+#+BEGIN_SRC emacs-lisp
+  (autopair-global-mode 1)
+  (when (boundp 'autopair-skip-whitespace)
+    (setq autopair-skip-whitespace t))
+  
+#+END_SRC
+
+*** Auto-indent-mode
+The autoindent package is something that I find quite useful.  I also
+like to insert some TextMate behaviors to my keys.
+#+BEGIN_SRC emacs-lisp
+  (with-no-warnings
+    (setq auto-indent-key-for-end-of-line-then-newline "<M-return>")
+    (setq auto-indent-key-for-end-of-line-insert-char-then-newline "<M-S-return>")
+    (setq auto-indent-kill-line-at-eol nil)
+    (setq auto-indent-delete-line-char-remove-extra-spaces t))
+  
+  (when (fboundp 'auto-indent-global-mode)
+    (auto-indent-global-mode))
+#+END_SRC
+*** Auto-complete mode
+Auto complete mode setup
+#+BEGIN_SRC emacs-lisp
+  (when (emacsmate-packge-load-path 'auto-complete)
+    (require 'auto-complete-config)
+    (ac-config-default))
+#+END_SRC 
+**** Show menu
+#+BEGIN_SRC emacs-lisp
+  (when (boundp 'ac-auto-show-menu)
+    (setq ac-auto-show-menu t))
+  (when (boundp 'ac-auto-start)
+    (setq ac-auto-start 2))
+  (when (boundp 'ac-delay)
+    (setq ac-delay 0))
+  
+  
+  
+#+END_SRC
+**** Finish completion by tab
+#+BEGIN_SRC emacs-lisp
+  (when (boundp 'ac-completing-map)
+    (define-key ac-completing-map "\t" 'ac-complete)
+    (define-key ac-completing-map "\r" nil))
+  
+#+END_SRC
+**** Ignore case
+#+BEGIN_SRC emacs-lisp
+  (when (boundp 'ac-ignore-case)
+    (setq ac-ignore-case 'smart))
+#+END_SRC
+**** Pos Tip for "beautiful" tips
+#+BEGIN_SRC emacs-lisp
+  (when (emacsmate-packge-load-path 'pos-tip)
+    (require 'pos-tip)
+    (when (eq system-type 'windows-nt)
+      (condition-case err
+          (when (= 23 emacs-major-version)
+            (pos-tip-w32-max-width-height nil))
+        (error (message "Error in postip")))))
+#+END_SRC
+*** Bookmarks
+:PROPERTIES:
+:ID: 2c39ce29-8541-4cd3-9715-ec0f0d368eb1
+:END:
+Using M$ visual studio style bookmarks:
+#+BEGIN_SRC emacs-lisp
+  (autoinstall bm-toggle bm "Toggle Bookmarks in current buffer")
+  (autoinstall bm-toggle-mouse bm "Toggle Bookmarks in current buffer")
+  
+  (autoinstall bm-next bm "Goto bookmark")
+  (autoinstall bm-next-mouse bm "Goto bookmark")
+  
+  (autoinstall bm-previous bm "Goto previous bookmark")
+  (autoinstall bm-previous-mouse bm "Goto previous bookmark")
+  (global-set-key (kbd "<left-fringe> <mouse-5>") 'bm-next-mouse)
+  (global-set-key (kbd "<left-fringe> <mouse-4>") 'bm-previous-mouse)
+  (global-set-key (kbd "<left-fringe> <mouse-1>") 'bm-toggle-mouse)
+  
+  
+  (global-set-key (kbd "<C-f2>") 'bm-toggle)
+  (global-set-key (kbd "<f2>")   'bm-next)
+  (global-set-key (kbd "<S-f2>") 'bm-previous)
+#+END_SRC
+
+To setup the right-fringe functionality you would use:
+
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "<left-fringe> <mouse-5>") 'bm-next-mouse)
+  (global-set-key (kbd "<left-fringe> <mouse-4>") 'bm-previous-mouse)
+  (global-set-key (kbd "<left-fringe> <mouse-1>") 'bm-toggle-mouse)
+  (when (boundp 'bm-marker)
+    (setq bm-marker 'bm-marker-right))
+#+END_SRC
+
+*** Emacs Lisp
+:PROPERTIES:
+:CUSTOM_ID: emacs-lisp
+:END:
+This does the following:
+- Turn on el-doc
+- Turn on coding hook
+- Removes =.elc= files on save.
+- Add =C-c v= to be `eval-buffer'
+- Adds extra autopair groups.
+- Changes adaptive filling for lisp-style comments
+#+begin_src emacs-lisp
+  (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
+  (add-hook 'emacs-lisp-mode-hook 'run-emacsmate-coding-hook)
+  (add-hook 'emacs-lisp-mode-hook 'emacsmate-remove-elc-on-save)
+  ;; (add-hook 'emacs-lisp-mode-hook 'idle-highlight)
+  (define-key emacs-lisp-mode-map (kbd "C-c v") 'eval-buffer)
+  
+  (defun emacsmate-remove-elc-on-save ()
+    "If you're saving an elisp file, likely the .elc is no longer valid."
+    (make-local-variable 'after-save-hook)
+    (add-hook 'after-save-hook
+              (lambda ()
+                (if (file-exists-p (concat buffer-file-name "c"))
+                    (delete-file (concat buffer-file-name "c"))))))
+  
+  (with-no-warnings
+    (defun emacsmate-add-extra-autopairs ()
+      "To add extra autopairs and change autopair behavior"
+      (when (not (featurep 'cl))
+        (require 'cl))
+      (when (boundp 'autopair-extra-pairs)
+        (when (boundp 'autopair-extra-pairs)
+          (push '(?` . ?')
+                (getf autopair-extra-pairs :comment))
+          (push '(?` . ?')
+                (getf autopair-extra-pairs :string))
+          (when (boundp 'autopair-skip-whitespace)
+            (set (make-local-variable 'autopair-skip-whitespace) 'chomp))))))
+  
+  (add-hook 'emacs-lisp-mode-hook 'emacsmate-add-extra-autopairs)
+  
+  
+#+end_src
+
+**** Paste Diffs
+
+When pasting diffs that start entirely with +, take out the initial +
+Also take off unnecessary ">" and "+" for example copying:
+
+#+BEGIN_SRC emacs-lisp
+  (defun emacsmate-emacs-lisp-fix-diff (beg end)
+    "Fixes ess path"
+    (save-restriction
+      (save-excursion
+        (save-match-data
+          (narrow-to-region beg end)
+          (goto-char (point-min))
+          (while (re-search-forward "^[ \t]*[+][ \t]+" nil t)
+            (replace-match ""))))))
+  
+  (defun emacsmate-emacs-lisp-turn-on-fix-diff ()
+    (interactive)
+    (when (and (boundp 'ess-language) (string= "S" ess-language))
+      (add-hook 'auto-indent-after-yank-hook 'emacsmate-emacs-lisp-fix-diff t t)))
+  (add-hook 'emacs-lisp-mode-hook 'emacsmate-emacs-lisp-turn-on-fix-diff)
+  
+#+END_SRC
+*** Ido Mode
+ido-mode is like magic pixie dust!
+
+
+The [[http://www.masteringemacs.org/articles/2010/10/10/introduction-to-ido-mode/][Introduction to Ido Mode]] provides a nice introduction and
+explanation of these customizations.
+
+#+srcname: emacsmate-loves-ido-mode
+#+begin_src emacs-lisp 
+  (when (> emacs-major-version 21)
+    (ido-mode t)
+    (mapc (lambda(ext)
+            (add-to-list 'completion-ignored-extensions ext))
+          '("elc" "exe" "com" "org_archive" "png" "gif" "csv" "jpg" "jpeg"))
+    (ido-ubiquitous 1)
+    (setq ido-enable-prefix t
+          ido-enable-flex-matching t
+          ido-create-new-buffer 'always
+          ido-use-filename-at-point nil
+          ido-enable-tramp-completion t
+          ido-everywhere t
+          org-completion-use-ido t
+          ido-max-prospects 10
+          ido-default-file-method 'selected-window
+          ido-ignore-extensions t
+          ido-file-extensions-order '(".org" ".R" ".ctl" ".pltc" ".nsi" ".txt" ".py" ".emacs" ".xml" ".el" ".ini" ".cfg" ".cnf" ".nsi" ".nsh")))
+  
+#+end_src
+
+See http://www.emacswiki.org/emacs/InteractivelyDoThings
+**** Display Completions Vertically
+I like the look.  I don't like the arrow keys not doing what I expect
+(changed with ergoemacs)
+#+BEGIN_SRC emacs-lisp
+  (setq ido-decorations (quote ("\n-> " "" "\n   " "\n   ..." "[" "]" " [No match]" " [Matched]" " [Not readable]" " [Too big]" " [Confirm]")))
+  
+  (defun ido-disable-line-trucation () (set (make-local-variable 'truncate-lines) nil))
+  (add-hook 'ido-minibuffer-setup-hook 'ido-disable-line-trucation)
+#+END_SRC
+
+
+**** Preventing auto-searches unless called explicitly
+#+BEGIN_SRC emacs-lisp
+  ;; disable auto searching for files unless called explicitly
+  (setq ido-auto-merge-delay-time 99999)
+  
+  (define-key ido-file-dir-completion-map (kbd "C-c C-s") 
+    (lambda() 
+      (interactive)
+      (ido-initiate-auto-merge (current-buffer))))
+#+END_SRC
+
+*** Scheme
+:PROPERTIES:
+:CUSTOM_ID: scheme
+:END:
+
+#+begin_src emacs-lisp
+(add-hook 'scheme-mode-hook 'run-emacsmate-coding-hook)
+;; (add-hook 'scheme-mode-hook 'idle-highlight)
+(font-lock-add-keywords 'scheme-mode
+			'(("(\\|)" . 'emacsmate-paren-face)))
+#+end_src
+
+*** Recent Files
+#+BEGIN_SRC emacs-lisp
+(recentf-mode 1) 
+#+END_SRC
+
+*** Yasnippet
+#+BEGIN_SRC emacs-lisp
+  (when (emacsmate-packge-load-path 'textmate-to-yas)
+    (require 'textmate-to-yas))
+  (yas-global-mode)
+  (when (not (file-exists-p (expand-file-name "snippets" emacsmate-dir)))
+    (make-directory (expand-file-name "snippets" emacsmate-dir)))
+  
+  (yas-load-directory (expand-file-name "snippets" emacsmate-dir))
+  
+  (defun yas-org-very-safe-expand ()
+    (let ((yas-fallback-behavior 'return-nil)) (yas-expand)))
+  
+  (defun yas-org-setup ()
+    ;; yasnippet (using the new org-cycle hooks)
+    (when (boundp 'yas-trigger-key)
+      (set (make-local-variable 'yas-trigger-key) [tab]))
+    (when (boundp 'org-tab-first-hook)
+      (add-to-list 'org-tab-first-hook 'yas-org-very-safe-expand))
+    (when (boundp 'yas-keymap)
+      (define-key yas-keymap [tab] 'yas-next-field)))
+  
+  (when (boundp 'org-mode-hook)
+    (add-hook 'org-mode-hook #'yas-org-setup))
+#+END_SRC
+
+*** Org-mode
+Org mode setup is in a separate file
+#+BEGIN_SRC emacs-lisp
+  (emacsmate-load-org
+   (expand-file-name "emacsmate-org.org" emacsmate-dir))
+#+END_SRC
+*** SSH
+Make plinkx the default method on windows.  I have had less problems
+with this method.
+#+BEGIN_SRC emacs-lisp
+  (when (and (eq system-type 'windows-nt) (executable-find "plink"))
+    (with-no-warnings
+      (setq ssh-program (executable-find "plink")))
+    (setq tramp-default-method "plinkx")
+    (defun plinkx (session)
+      "Connects to a saved plink session"
+      (interactive (list (read-from-minibuffer "Saved Session: ")))
+      (ssh (concat "-load " session) (concat "*" session "*"))
+      (message "%s" session)))
+  
+#+END_SRC
+
+*** Whitespace mode
+#+BEGIN_SRC emacs-lisp
+  ;; Taken from ergoemacs
+  (with-no-warnings
+    (defun toggle-whitespace-setting ()
+      "Toggle some display settings for `whitespace-mode'."
+      (interactive)
+      (let (stateBefore stateAfter (statesList '(0 1)))
+        (setq stateBefore (if (get 'toggle-whitespace-setting 'state) (get 'toggle-whitespace-setting 'state) (elt statesList 0)))
+        (setq stateAfter (% (+ stateBefore (length statesList) 1) (length statesList)))
+        (put 'toggle-whitespace-setting 'state stateAfter)
+        (cond
+         ((equal stateAfter 0)
+          (progn
+            (when (boundp 'whitespace-style)
+              (setq whitespace-style '(tabs spaces trailing lines space-before-tab newline indentation empty space-after-tab space-mark tab-mark newline-mark)))
+            (when (boundp 'whitespace-display-mappings)
+              (setq whitespace-display-mappings
+                    '((space-mark 32 [183] [46])
+                      (space-mark 160 [164] [95])
+                      (space-mark 2208 [2212] [95])
+                      (space-mark 2336 [2340] [95])
+                      (space-mark 3616 [3620] [95])
+                      (space-mark 3872 [3876] [95])
+                      (newline-mark 10 [36 10])
+                      (tab-mark 9 [187 9] [92 9]))))
+            (message "whitespace-setting set to default.")))
+         ((equal stateAfter 1)
+          (progn
+            ;; Make whitespace-mode with very basic background coloring for whitespaces
+            (setq whitespace-style '( spaces tabs newline space-mark tab-mark newline-mark ))
+            
+            ;; Make whitespace-mode and whitespace-newline-mode use paragraph for end of line char and triangle for tab.
+            (setq whitespace-display-mappings
+                  '(
+                    (space-mark 32 [183] [46]) ; normal space, MIDDLE DOT, FULL STOP.
+                    (space-mark 160 [164] [95])
+                    (space-mark 2208 [2212] [95])
+                    (space-mark 2336 [2340] [95])
+                    (space-mark 3616 [3620] [95])
+                    (space-mark 3872 [3876] [95])
+                    (newline-mark 10 [182 10]) ; newlne
+                    (tab-mark 9 [9655 9] [92 9]) ; tab
+                    )) 
+            (message "whitespace-setting set to using %s for tab and %s for newline."
+                     (make-string 1 9655) (make-string 1 182)))))
+        
+        (when (and (boundp 'global-whitespace-mode) global-whitespace-mode)
+          (global-whitespace-mode 0) (global-whitespace-mode 1))
+        (when (and (boundp 'whitespace-mode) whitespace-mode)
+          (whitespace-mode 0) (whitespace-mode 1))
+        
+        ))
+    (with-no-warnings
+    ;; Make whitespace-mode with very basic background coloring for whitespaces.
+    ;; http://ergoemacs.org/emacs/whitespace-mode.html
+    (setq whitespace-style (quote ( spaces tabs newline space-mark tab-mark newline-mark )))
+    
+    ;; Make whitespace-mode and whitespace-newline-mode use paragraph marks for end of line char and triangles for for tab.
+    (setq whitespace-display-mappings
+          ;; all numbers are unicode codepoint in decimal. e.g. (insert-char 182 1)
+          '(
+            (space-mark 32 [183] [46]) ; SPACE 32, 183 MIDDLE DOT, 46 FULL STOP
+            (newline-mark 10 [182 10]) ; LINE FEED, 
+            (tab-mark 9 [9655 9] [92 9]) ; tab
+            ))))
+#+END_SRC
+*** Perl
+Use Cperl instead of perl-mode
+#+BEGIN_SRC emacs-lisp
+  ;; use cperl-mode instead of perl-mode
+  (setq auto-mode-alist (rassq-delete-all 'perl-mode auto-mode-alist))
+  (add-to-list 'auto-mode-alist '("\\.\\(p\\([lm]\\)\\)\\'" . cperl-mode))
+  (setq interpreter-mode-alist (rassq-delete-all 'perl-mode interpreter-mode-alist))
+  (add-to-list 'interpreter-mode-alist '("perl" . cperl-mode))
+  (add-to-list 'interpreter-mode-alist '("perl5" . cperl-mode))
+  (add-to-list 'interpreter-mode-alist '("miniperl" . cperl-mode))
+#+END_SRC
+*** Helm
+Helm uses eshell, so starting eshell before running helm is useful.
+However it is a trade-off of start-time vs helm start-time.  If helm
+isn't used, the extra start time is not useful.  For this reason, I
+will load eshell only if helm is loaded
+
+#+BEGIN_SRC emacs-lisp
+  (eval-after-load "helm"
+    (let ((default-directory (getenv "HOME")))
+      (command-execute 'eshell)
+      (bury-buffer)))
+#+END_SRC
+
+*** Dired+
+#+BEGIN_SRC emacs-lisp
+  (when (emacsmate-packge-load-path 'dired+)
+    (require 'dired+))
+#+END_SRC
+*** Info+
+
+*** Undo Tree
+#+BEGIN_SRC emacs-lisp
+  (when (emacsmate-packge-load-path 'undo-tree)
+    (require 'undo-tree)
+    (global-undo-tree-mode))
+#+END_SRC
+
+** Mode Line Changes
+Based off of http://amitp.blogspot.com/2011/08/emacs-custom-mode-line.html
+#+BEGIN_SRC emacs-lisp
+  ;; Mode line setup
+  (when (emacsmate-packge-load-path 'powerline)
+    (require 'powerline)
+    ;; Extra mode line faces
+    (make-face 'mode-line-read-only-face)
+    (make-face 'mode-line-modified-face)
+    (make-face 'mode-line-folder-face)
+    (make-face 'mode-line-project-face)
+    (make-face 'mode-line-project-arrow-face)
+    (make-face 'mode-line-position-face)
+    (make-face 'mode-line-mode-face)
+    (make-face 'mode-line-minor-mode-face)
+    (make-face 'mode-line-process-face)
+    (make-face 'mode-line-80col-face)
+    (make-face 'mode-line-position-per-face)
+    
+    (set-face-attribute 'mode-line nil
+                        :foreground "gray60" :background "gray20"
+                        :inverse-video nil
+                        :box '(:line-width 6 :color "gray20" :style nil))
+    
+    (set-face-attribute 'mode-line-inactive nil
+                        :foreground "gray80" :background "gray40"
+                        :inverse-video nil
+                        :box '(:line-width 6 :color "gray40" :style nil))
+    
+    (set-face-attribute 'mode-line-read-only-face nil
+                        :inherit 'mode-line-face
+                        :foreground "#4271ae"
+                        :box '(:line-width 2 :color "#4271ae"))
+    (set-face-attribute 'mode-line-modified-face nil
+                        :inherit 'mode-line-face
+                        :foreground "#c82829"
+                        :background "#ffffff"
+                        :box '(:line-width 2 :color "#c82829"))
+  
+    (set-face-attribute 'mode-line-project-face nil
+                        :inherit 'mode-line-face
+                        :background "#eab700"
+                        :foreground "gray30")
+  
+    (set-face-attribute 'mode-line-position-per-face nil
+                        :inherit 'mode-line-project-face
+                        :height 110)
+  
+    (set-face-attribute 'mode-line-filename-face nil
+                        :inherit 'mode-line-face
+                        :foreground "#eab700"
+                        :background "gray30"
+                        :weight 'bold)
+  
+    (set-face-attribute 'mode-line-position-face nil
+                        :inherit 'mode-line-face
+                        :family "Menlo" :height 100)
+  
+    (set-face-attribute 'mode-line-mode-face nil
+                        :inherit 'mode-line-face
+                        :foreground "gray80")
+  
+    (set-face-attribute 'mode-line-minor-mode-face nil
+                        :inherit 'mode-line-mode-face
+                        :foreground "gray40"
+                        :height 110)
+  
+    (set-face-attribute 'mode-line-process-face nil
+                        :inherit 'mode-line-face
+                        :foreground "#718c00")
+  
+    (set-face-attribute 'mode-line-80col-face nil
+                        :inherit 'mode-line-position-face
+                        :foreground "#eab700"
+                        :background "gray20"
+                        :weight 'bold)
+    (setq-default
+     mode-line-format
+     '("%e"
+       (:eval
+        (let* ((active (eq (frame-selected-window) (selected-window)))
+               (face1 (if active 'powerline-active1 'powerline-inactive1))
+               (face2 (if active 'powerline-active2 'powerline-inactive2))
+               (lhs (list
+                     (powerline-raw "%*" (cond
+                                          (buffer-read-only
+                                           'mode-line-read-only-face)
+                                          ((condition-case err
+                                               (buffer-modified-p)
+                                             (error nil))
+                                           'mode-line-modified-face)
+                                          (t nil)) 'l)
+                     (powerline-arrow-right (cond
+                                             (buffer-read-only
+                                              'mode-line-read-only-face)
+                                             ((condition-case err
+                                                  (buffer-modified-p)
+                                                (error nil))
+                                              'mode-line-modified-face)
+                                             (t nil)) 'mode-line-project-face)
+                     ;;(powerline-buffer-size nil 'l)
+                     (powerline-raw (concat (car (funcall tabbar-buffer-groups-function)) " ") 'mode-line-project-face 'l)
+                     
+                     (powerline-arrow-right 'mode-line-project-face 'mode-line-filename-face)
+                     
+                     (powerline-buffer-id 'mode-line-filename-face 'l)
+                     (powerline-raw " " 'mode-line-filename-face)
+                     (powerline-arrow-right  'mode-line-filename-face nil)
+                     
+                     (powerline-major-mode 'mode-line-face 'l)
+                     (powerline-raw " [" 'mode-line-minor-mode-face)
+                     (powerline-minor-modes 'mode-line-minor-mode-face nil)
+                     (powerline-raw "] " 'mode-line-minor-mode-face)
+                     (powerline-raw mode-line-process 'mode-line-minor-mode-face 'l)
+                     
+                     (powerline-narrow 'mode-line-face 'l)
+                     
+                     (powerline-arrow-right nil face2)
+                     
+                     (powerline-vc face2)))
+               (rhs (list
+                     (powerline-raw global-mode-string face2 'r)
+                     
+                     (powerline-arrow-left face2 nil)
+                     
+                     (powerline-raw "%4l" 'mode-line-position-face  'r)
+                     (powerline-raw ":" 'mode-line-position-face)
+                     (powerline-raw "%3c" (if (>= (current-column) 80)
+                                              'mode-line-80col-face
+                                            'mode-line-position-face) 'r)
+                     
+                     (powerline-arrow-left nil 'mode-line-project-face)
+                     (powerline-raw " " 'mode-line-project-face)
+                     
+                     (powerline-raw "%6p" 'mode-line-position-per-face 'r)
+                     
+                     (powerline-hud nil 'mode-line-project-face))))
+          (concat
+           (powerline-render lhs)
+           (powerline-fill face2 (powerline-width rhs))
+           (powerline-render rhs)))))))
+  
+#+END_SRC
+
+** Misc Settings
+*** Window systems Settings
+#+begin_src emacs-lisp 
+  (when window-system
+    (mouse-wheel-mode t)
+    (set-terminal-coding-system 'utf-8)
+    (set-keyboard-coding-system 'utf-8)
+    (prefer-coding-system 'utf-8)
+    (put 'narrow-to-region 'disabled nil)
+    (put 'upcase-region 'disabled nil)
+    (put 'downcase-region 'disabled nil)
+    (put 'erase-buffer 'disabled nil)
+    (put 'scroll-left 'disabled nil)
+    (put 'dired-find-alternate-file 'disabled nil)
+    
+  
+    (with-no-warnings
+      (setq visible-bell t
+            echo-keystrokes 0.1
+            font-lock-maximum-decoration t
+            inhibit-startup-message t
+            transient-mark-mode t
+            color-theme-is-global t
+            delete-by-moving-to-trash t
+            shift-select-mode nil
+            truncate-partial-width-windows nil
+            uniquify-buffer-name-style 'forward
+            whitespace-style '(trailing lines space-before-tab
+                                        indentation space-after-tab)
+            whitespace-line-column 100
+            ediff-window-setup-function 'ediff-setup-windows-plain
+            xterm-mouse-mode t
+            save-place t)))
+  (when (not (file-exists-p desktop-dirname))
+    (make-directory desktop-dirname t))
+  
+#+end_src
+
+*** Camel Case
+Make camel case backward word work.
+#+BEGIN_SRC emacs-lisp
+(when (fboundp 'global-subword-mode ) (global-subword-mode 1))
+#+END_SRC
+*** Line Numbering
+#+begin_src emacs-lisp
+  (when (emacsmate-packge-load-path 'linum-off)
+    (require 'linum-off)
+    (global-linum-mode 1))
+    
+#+end_src
+*** Compression settings
+#+BEGIN_SRC emacs-lisp
+(auto-compression-mode t)
+#+END_SRC
+
+*** Highlight Matching Parenthesis 
+#+BEGIN_SRC emacs-lisp
+(show-paren-mode 1)
+#+END_SRC
+
+*** Spell Checking, Tabs, Imenu, and coding hook
+#+BEGIN_SRC emacs-lisp
+  (set-default 'indent-tabs-mode nil)
+  (set-default 'indicate-empty-lines t)
+  (set-default 'imenu-auto-rescan t)
+  
+  (add-hook 'text-mode-hook 'turn-on-auto-fill)
+  (add-hook 'text-mode-hook 'turn-on-flyspell)
+  
+  (defalias 'yes-or-no-p 'y-or-n-p)
+  ;; Seed the random-number generator
+  (random t)
+#+END_SRC
+
+*** Save History
+Turn on save history to save history between sessions.
+#+BEGIN_SRC emacs-lisp
+  (savehist-mode 1)
+#+END_SRC
+*** Tabbar/Ruler & Project Management
+Setup global tabbar and ruler.
+#+BEGIN_SRC emacs-lisp
+  (when (emacsmate-packge-load-path 'tabbar-ruler)
+    (with-no-warnings
+      (setq tabbar-ruler-global-tabbar 't) ; If you want tabbar
+      (setq tabbar-ruler-global-ruler 't) ; if you want a global ruler
+      (setq tabbar-ruler-popup-menu 't) ; If you want a popup menu.
+      (setq tabbar-ruler-popup-toolbar 't) ; If you want a popup toolbar
+      )
+    (require 'tabbar-ruler))
+  
+#+END_SRC
+Also set it up to be used with projectile.
+
+#+BEGIN_SRC emacs-lisp
+  (projectile-global-mode 1)
+  
+  (defun ergoemacs-tabbar-buffer-groups ()
+    "Return the list of group names BUFFER belongs to.
+      Return only one group for each buffer."
+    (cond
+     ((or (get-buffer-process (current-buffer)) (memq major-mode '(comint-mode compilation-mode))) '("Term"))
+     ((string-equal "*" (substring (buffer-name) 0 1)) '("Misc"))
+     ((condition-case err
+          (projectile-project-root)
+        (error nil)) (list (projectile-project-name)))
+     ((memq major-mode '(emacs-lisp-mode python-mode emacs-lisp-mode c-mode c++-mode makefile-mode lua-mode vala-mode)) '("Coding"))
+     ((memq major-mode '(javascript-mode js-mode nxhtml-mode html-mode css-mode)) '("HTML"))
+     ((memq major-mode '(org-mode calendar-mode diary-mode)) '("Org"))
+     ((memq major-mode '(dired-mode)) '("Dir"))
+     (t '("Main"))))
+  
+  (with-no-warnings
+    (setq tabbar-buffer-groups-function 'ergoemacs-tabbar-buffer-groups))
+#+END_SRC
+
+     
+     
+     
+*** Cosmetics
+
+#+begin_src emacs-lisp
+(eval-after-load 'diff-mode
+  '(progn
+     (set-face-foreground 'diff-added "green4")
+     (set-face-foreground 'diff-removed "red3")))
+
+(eval-after-load 'magit
+  '(progn
+     (set-face-foreground 'magit-diff-add "green3")
+     (set-face-foreground 'magit-diff-del "red3")))
+#+end_src
+
+** Saving File
+#+BEGIN_SRC emacs-lisp
+  (when (emacsmate-packge-load-path 'info+)
+    (require 'info+))
+#+END_SRC
+*** Backups
+Rather than saving backup files scattered all over the file system,
+let them live in the backups/directory inside of the emacsmate directory.
+#+BEGIN_SRC emacs-lisp
+  (unless (file-exists-p (expand-file-name "backups" emacsmate-dir))
+    (make-directory (expand-file-name "backups" emacsmate-dir)))
+  
+  (setq backup-directory-alist
+        `((".*" . ,(expand-file-name "backups"
+                                     emacsmate-dir))))
+  
+  (setq auto-save-file-name-transforms
+        `((".*" ,(expand-file-name "backups"
+                                   emacsmate-dir) t)))
+  
+  ;; From http://emacswiki.org/emacs/BackupDirectory
+  (message "Deleting old backup files...")
+  (condition-case err
+      (let ((week (* 60 60 24 7))
+            (current (float-time (current-time))))
+        (dolist (file (directory-files (expand-file-name "backups"
+                                                         emacsmate-dir) t))
+          (when (and (backup-file-name-p file)
+                     (> (- current (float-time (fifth (file-attributes file))))
+                        week))
+            (message "%s" file)
+            (delete-file file))))
+    (error (message "Error deleting old backup files")))
+  
+#+END_SRC
+
+*** Encoding
+*** Save Automatically when
+**** Focus is lost?
+I don't believe this can be implemented in emacs (though it can in
+Xemacs).  See:
+http://stackoverflow.com/questions/1230245/how-to-automatically-save-files-on-lose-focus-in-emacs
+
+However, saving can be toggled when actions occur in emacs.
+** Color Theme
+The EmacsMate package uses the Zenburn theme by default.
+#+BEGIN_SRC emacs-lisp
+  (condition-case err
+      (when (emacsmate-packge-load-path 'zenburn-theme)
+        (load-theme 'zenburn t))
+    (error (message "Error Loading zenburn theme.")))
+  
+#+END_SRC
+
+
+

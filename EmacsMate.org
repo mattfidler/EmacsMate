@@ -586,30 +586,9 @@ To use CUA-type keys and others, I use:
   (when (emacsmate-packge-load-path 'ergoemacs-mode)
     (require 'ergoemacs-mode)
     (ergoemacs-key "M-a" 'smex-if-exists "M-x")
-    (ergoemacs-key "M-;" 'helm-mini "Helm")
     (ergoemacs-key "M-m" 'org-capture "Capture")
     (ergoemacs-key "M-M" 'org-agenda "Agenda")
-    (ergoemacs-minor-key 'helm-before-initialize-hook `(,(ergoemacs-kbd "M-;" t) helm-keyboard-quit helm-map))
-    ;; Swap ido keys so that up and down are next and previous match,
-    ;; and left and right are history commands.
-    
-    ;; This works with the ido hack to have a vertical display of choices.
-    ;; (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(forward-char ido-next-match-dir ido-file-dir-completion-map))
-    ;; (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(backward-char ido-prev-match-dir ido-file-dir-completion-map))
-    ;; (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<right>" ido-next-match-dir ido-file-dir-completion-map))
-    ;; (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<left>" ido-prev-match-dir ido-file-dir-completion-map))
-    
-    ;; (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(forward-char ido-next-match-dir ido-file-completion-map))
-    ;; (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(backward-char ido-prev-match-dir ido-file-completion-map))
-    ;; (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<right>" ido-next-match-dir ido-file-completion-map))
-    ;; (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<left>" ido-prev-match-dir ido-file-completion-map))
-    
-    
-    ;; (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(previous-line ido-prev-match ido-common-completion-map))
-    ;; (ergoemacs-minor-key 'ido-minibuffer-setup-hook '(next-line ido-next-match ido-common-completion-map))
-    ;; (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<up>" ido-prev-match ido-common-completion-map))
-    ;; (ergoemacs-minor-key 'ido-minibuffer-setup-hook '("<down>" ido-next-match ido-common-completion-map))
-    (require 'expand-region)
+        (require 'expand-region)
     (ergoemacs-key "M-8" 'er/expand-region
                    (format "%sregion%s"
                            (make-string 1 8592)
@@ -630,6 +609,7 @@ To use CUA-type keys and others, I use:
     (ergoemacs-mode 1)
     ;;
     (global-set-key "\C-x\C-c" 'ignore)
+    (global-set-key "\C-x\C-z" 'ignore)
     (global-set-key (kbd "C-M-S-Q") 'save-buffers-kill-emacs))
   (cua-mode) 
   (org-cua-dwim-activate)
@@ -889,6 +869,7 @@ explanation of these customizations.
           ido-everywhere t
           org-completion-use-ido t
           ido-max-prospects 10
+          ido-use-virtual-buffers t
           ido-default-file-method 'selected-window
           ido-ignore-extensions t
           ido-file-extensions-order '(".org" ".R" ".ctl" ".pltc" ".nsi" ".txt" ".py" ".emacs" ".xml" ".el" ".ini" ".cfg" ".cnf" ".nsi" ".nsh")))

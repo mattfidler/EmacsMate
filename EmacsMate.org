@@ -1042,19 +1042,6 @@ Use Cperl instead of perl-mode
   (add-to-list 'interpreter-mode-alist '("perl5" . cperl-mode))
   (add-to-list 'interpreter-mode-alist '("miniperl" . cperl-mode))
 #+END_SRC
-*** Helm
-Helm uses eshell, so starting eshell before running helm is useful.
-However it is a trade-off of start-time vs helm start-time.  If helm
-isn't used, the extra start time is not useful.  For this reason, I
-will load eshell only if helm is loaded
-
-#+BEGIN_SRC emacs-lisp
-  (eval-after-load "helm"
-    (let ((default-directory (getenv "HOME")))
-      (command-execute 'eshell)
-      (bury-buffer)))
-#+END_SRC
-
 *** Dired+
 #+BEGIN_SRC emacs-lisp
   (when (emacsmate-packge-load-path 'dired+)
@@ -1081,7 +1068,7 @@ Drag and Drop Extend
 Based off of http://amitp.blogspot.com/2011/08/emacs-custom-mode-line.html
 #+BEGIN_SRC emacs-lisp
   ;; Mode line setup
-  (when (emacsmate-packge-load-path 'powerline)
+  (when (and nil (emacsmate-packge-load-path 'powerline))
     (require 'powerline)
     ;; Extra mode line faces
     (make-face 'mode-line-read-only-face)
@@ -1322,12 +1309,14 @@ Setup global tabbar and ruler.
       (setq tabbar-ruler-popup-menu 't) ; If you want a popup menu.
       (setq tabbar-ruler-popup-toolbar 't) ; If you want a popup toolbar
       )
-    (require 'tabbar-ruler))
+    ;(require 'tabbar-ruler)
+)
   
 #+END_SRC
 Also set it up to be used with projectile.
 
 #+BEGIN_SRC emacs-lisp
+  (setq projectile-require-project-root nil)
   (projectile-global-mode 1)
   
   (defun ergoemacs-tabbar-buffer-groups ()

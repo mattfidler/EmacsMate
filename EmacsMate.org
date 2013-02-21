@@ -1302,16 +1302,15 @@ Turn on save history to save history between sessions.
 *** Tabbar/Ruler & Project Management
 Setup global tabbar and ruler.
 #+BEGIN_SRC emacs-lisp
-  (when (emacsmate-packge-load-path 'tabbar-ruler)
-    (with-no-warnings
-      (setq tabbar-ruler-global-tabbar 't) ; If you want tabbar
-      (setq tabbar-ruler-global-ruler 't) ; if you want a global ruler
-      (setq tabbar-ruler-popup-menu 't) ; If you want a popup menu.
-      (setq tabbar-ruler-popup-toolbar 't) ; If you want a popup toolbar
-      )
-    ;(require 'tabbar-ruler)
-)
-  
+    (when (emacsmate-packge-load-path 'tabbar-ruler)
+      (with-no-warnings
+        (setq tabbar-ruler-global-tabbar 't) ; If you want tabbar
+        (setq tabbar-ruler-global-ruler 't) ; if you want a global ruler
+        (setq tabbar-ruler-popup-menu 't) ; If you want a popup menu.
+        (setq tabbar-ruler-popup-toolbar 't) ; If you want a popup toolbar
+        )
+      (require 'tabbar-ruler))
+    
 #+END_SRC
 Also set it up to be used with projectile.
 

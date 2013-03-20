@@ -357,9 +357,14 @@ a lambda doesn't already exist in the list.
     "EmacsMate autoload file")
   (require 'package)
   (when (boundp 'package-user-dir)
-    (setq package-user-dir (concat emacsmate-dir "elpa")))
+    (setq package-user-dir (concat emacsmate-dir "elpa"
+                                   (cond
+                                    ((>= 24.3 (string-to-number emacs-version))
+                                     "24.3")
+                                    (t "")))))h
   
   (setq custom-file (concat emacsmate-dir "custom.el"))
+  
 #+END_SRC
 ** Ubiquitous Packages
 #+BEGIN_SRC emacs-lisp

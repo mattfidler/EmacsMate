@@ -357,7 +357,12 @@ a lambda doesn't already exist in the list.
     "EmacsMate autoload file")
   (require 'package)
   (when (boundp 'package-user-dir)
-    (setq package-user-dir (concat emacsmate-dir "elpa")))
+    (setq package-user-dir (concat emacsmate-dir "elpa"
+                                   (cond
+                                    ((and (= emacs-major-version 24)
+                                          (>= emacs-minor-version 3))
+                                     "-24.3")
+                                    (t "")))))
   
   (setq custom-file (concat emacsmate-dir "custom.el"))
 #+END_SRC
@@ -1068,153 +1073,101 @@ Drag and Drop Extend
 Based off of http://amitp.blogspot.com/2011/08/emacs-custom-mode-line.html
 #+BEGIN_SRC emacs-lisp
   ;; Mode line setup
-  (when (and nil (emacsmate-packge-load-path 'powerline))
+  (when (emacsmate-packge-load-path 'powerline)
     (require 'powerline)
-    ;; Extra mode line faces
-    (make-face 'mode-line-read-only-face)
-    (make-face 'mode-line-modified-face)
-    (make-face 'mode-line-folder-face)
-    (make-face 'mode-line-project-face)
-    (make-face 'mode-line-project-arrow-face)
-    (make-face 'mode-line-position-face)
-    (make-face 'mode-line-mode-face)
-    (make-face 'mode-line-minor-mode-face)
-    (make-face 'mode-line-process-face)
-    (make-face 'mode-line-80col-face)
-    (make-face 'mode-line-position-per-face)
-    (make-face 'mode-line-filename-face)
     
-    (defun emacsmate-powerline-setup-faces (&optional frame)
-      "Set up of faces based on theme setting"
+    (defun powerline-emacsmate-theme ()
+      "Setup a default mode-line."
       (interactive)
-      (set-face-attribute 'mode-line frame
-                          :foreground "gray60" :background "gray20"
-                          :inverse-video frame)
-      
-      (set-face-attribute 'mode-line-inactive frame
-                          :foreground "gray80" :background "gray40"
-                          :inverse-video frame)
-      
-      (set-face-attribute 'mode-line-read-only-face frame
-                          :inherit 'mode-line
-                          :foreground "#4271ae"
-                          :box '(:line-width 2 :color "#4271ae"))
-      (set-face-attribute 'mode-line-modified-face frame
-                          :inherit 'mode-line
-                          :foreground "#c82829"
-                          :background "#ffffff"
-                          :box '(:line-width 2 :color "#c82829"))
-      
-      (set-face-attribute 'mode-line-project-face frame
-                          :inherit 'mode-line-buffer-id
-                          :background (face-attribute 'mode-line-buffer-id :foreground)
-                          :foreground (face-attribute 'mode-line :background))
-      
-      (set-face-attribute 'mode-line-position-per-face frame
-                          :inherit 'mode-line-project-face
-                          :height 110)
-      
-      (set-face-attribute 'mode-line-filename-face frame
-                          :inherit 'mode-line-buffer-id
-                          :background (face-attribute 'mode-line-inactive :background)
-                          :weight 'bold)
-      
-      (set-face-attribute 'mode-line-position-face frame
-                          :inherit 'mode-line
-                          :height 100)
-      
-      (set-face-attribute 'mode-line-mode-face frame
-                          :inherit 'mode-line)
-      
-      (set-face-attribute 'mode-line-minor-mode-face frame
-                          :inherit 'mode-line-mode-face
-                          :foreground "gray40"
-                          :height 110)
-      
-      (set-face-attribute 'mode-line-process-face frame
-                          :inherit 'mode-line
-                          :foreground "#718c00")
-      
-      (set-face-attribute 'mode-line-80col-face frame
-                          :inherit 'mode-line-position-face
-                          :foreground "#eab700"
-                          :background "gray20"
-                          :weight 'bold))
+      (setq-default mode-line-format
+                    '("%e"
+                      (:eval
+                       (let* ((active (powerline-selected-window-active))
+                              (mode-line (if active 'mode-line 'mode-line-inactive))
+                              (face1 (if active 'powerline-active1
+                                       'powerline-inactive1))
+                              (face2 (if active 'powerline-active2
+                                       'powerline-inactive2))
+                              (separator-left
+                               (intern (format "powerline-%s-%s"
+                                               powerline-default-separator
+                                               (car powerline-default-separator-dir))))
+                              (separator-right
+                               (intern (format "powerline-%s-%s"
+                                               powerline-default-separator
+                                               (cdr powerline-default-separator-dir))))
+                              (lhs (list
+                                    (powerline-raw "%*" face1 'l)
+                                    (powerline-buffer-size face1 'l)
+                                    
+                                    (powerline-raw mode-line-mule-info face1 'l)
+                                    (powerline-raw (condition-case err
+                                                       (concat (car (funcall tabbar-buffer-groups-function)) " ")
+                                                     (error "Error ")) face1 'l)
+                                    
+                                    (funcall separator-left face1 mode-line)
+                                    
+                                    (powerline-buffer-id nil 'l)
+                                    
+                                    (when which-function-mode
+                                      (concat
+                                       " ["
+                                       (powerline-which-func 'which-func nil)
+                                       "]"))
+                                    
+                                    
+                                    (powerline-raw " ")
+                                    (funcall separator-left mode-line face1)
+                                    
+                                    (when (boundp 'erc-modified-channels-object)
+                                      (powerline-raw erc-modified-channels-object
+                                                     face1 'l))
+                                    
+                                    (powerline-major-mode face1 'l)
+                                    
+                                    (powerline-raw " " face1)
+                                    
+                                    (powerline-process face1)
+                                    (powerline-minor-modes face1 nil)
+                                    (powerline-narrow face1 'l)
+                                    
+                                    (powerline-raw " " face1)
+                                    (funcall separator-left face1 face2)
+                                    
+                                    (powerline-vc face2 'r)))
+                              (rhs (list
+                                    (powerline-raw global-mode-string face2 'r)
+                                    
+                                    (funcall separator-right face2 face1)
+                                    
+                                    (powerline-raw "%4l" face1 'l)
+                                    (powerline-raw ":" face1 'l)
+                                    (powerline-raw "%3c" face1 'r)
+                                    
+                                    (funcall separator-right face1 mode-line)
+                                    (powerline-raw " ")
+                                    
+                                    (powerline-raw "%6p" nil 'r)
+                                    
+                                    (powerline-hud face2 face1))))
+                         ;;(message "%s %s" separator-left (funcall 'powerline-wave-left mode-line face1))
+                         (concat
+                          (powerline-render lhs)
+                          (powerline-fill face2 (powerline-width rhs))
+                          (powerline-render rhs)))))))
     
-    (defadvice load-theme (around EmacsMate-reset-powerline activate)
-      "Resets Powerline mode bar based on currently loaded theme."
-      ad-do-it
-      (emacsmate-powerline-setup-faces))
-    (setq-default
-     mode-line-format
-     '("%e"
-       (:eval
-        (let* ((active (eq (frame-selected-window) (selected-window)))
-               (face1 (if active 'powerline-active1 'powerline-inactive1))
-               (face2 (if active 'powerline-active2 'powerline-inactive2))
-               (project (if active 'mode-line-project-face 'mode-line-inactive))
-               (filename (if active 'mode-line-filename-face 'mode-line-inactive))
-               (face3 (cond
-                       ((condition-case err
-                            (buffer-read-only)
-                          (error nil))
-                        'mode-line-read-only-face)
-                       ((condition-case err
-                            (buffer-modified-p)
-                          (error nil))
-                        'mode-line-modified-face)
-                       (t nil)))
-               (lhs (list
-                     ;;(powerline-buffer-size face3 'l)
-                     (powerline-raw "%*"  face3 'l)
-                     
-                     (powerline-arrow-right face3 project)
-                     (powerline-raw (condition-case err
-                                        (concat (car (funcall tabbar-buffer-groups-function)) " ")
-                                      (error "Error ")) project 'l)
-                     
-                     (if active
-                         (powerline-arrow-right 'mode-line-project-face 'mode-line-filename-face)
-                       (powerline-raw ">" 'mode-line-inactive))
-                     
-                     (powerline-buffer-id filename 'l)
-                     (powerline-raw " " 'mode-line-filename-face)
-                     (if active
-                         (powerline-arrow-right  'mode-line-filename-face nil)
-                       (powerline-raw ">" 'mode-line-inactive))
-                     
-                     (powerline-major-mode (if active 'mode-line 'mode-line-inactive) 'l)
-                     (powerline-raw " [" (if active 'mode-line-minor-mode-face 'mode-line-inactive))
-                     (powerline-minor-modes (if active 'mode-line-minor-mode-face 'mode-line-inactive) nil)
-                     (powerline-raw "] " (if active 'mode-line-minor-mode-face 'mode-line-inactive))
-                     (powerline-raw mode-line-process (if active 'mode-line-minor-mode-face 'mode-line-inactive) 'l)
-                     
-                     (powerline-narrow (if active 'mode-line-minor-mode-face 'mode-line-inactive) 'l)
-                     
-                     (powerline-arrow-right nil face2)
-                     
-                     (powerline-vc face2)))
-               (rhs (list
-                     (powerline-raw global-mode-string face2 'r)
-                     
-                     (powerline-arrow-left face2 nil)
-                     
-                     (powerline-raw "%4l" (if active 'mode-line-position-face 'mode-line-inactive)  'r)
-                     (powerline-raw ":" (if active 'mode-line-position-face 'mode-line-inactive))
-                     (powerline-raw "%3c" (if (>= (current-column) 80)
-                                              (if active 'mode-line-80col-face 'mode-line-inactive)
-                                            (if active 'mode-line-position-face 'mode-line-inactive)) 'r)
-                     
-                     (powerline-arrow-left nil 'mode-line-project-face)
-                     (powerline-raw " " 'mode-line-project-face)
-                     
-                     (powerline-raw "%6p" 'mode-line-position-per-face 'r)
-                     
-                     (powerline-hud nil 'mode-line-project-face))))
-          (concat
-           (powerline-render lhs)
-           (powerline-fill face2 (powerline-width rhs))
-           (powerline-render rhs)))))))
+    (setq powerline-default-separator 'arrow-fade)
+    (diminish 'projectile-mode "")
+    (diminish 'undo-tree-mode "")
+    (diminish 'yas-minor-mode "")
+    ;;(diminish 'auto-indent-mode "")
+    (diminish 'autopair-mode "")
+    (diminish 'auto-complete-mode "")
+    (diminish 'flyspell-mode "")
+    (diminish 'org-indent-mode "")
+    (diminish 'iimage-mode "")
+    ;;(diminish 'auto-fill-mode "")
+    (powerline-emacsmate-theme))
   
 #+END_SRC
 

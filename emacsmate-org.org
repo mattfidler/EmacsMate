@@ -109,11 +109,13 @@ Org-babel currently supported languages
 #+END_SRC
 
 Reading/Editing code inside org-mode code-blocks is much more like
-reading and editing of code using its major mode
+reading and editing of code using its major mode.  Currently disabled
+since it makes org-mode laggy for me...
 
 #+BEGIN_SRC emacs-lisp
-  (setq org-src-fontify-natively t)
-  (setq org-src-tab-acts-natively t)
+  (when nil
+    (setq org-src-fontify-natively t)
+    (setq org-src-tab-acts-natively t))
 #+END_SRC
 
 

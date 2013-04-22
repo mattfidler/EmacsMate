@@ -223,17 +223,18 @@ This is based on my changing [[http://eschulte.me/emacs24-starter-kit/][Emacs St
       keyfreq
       ergoemacs-mode
       helm
+      helm-projectile
       undo-tree
       ido-ubiquitous
       melpa
       org-cua-dwim
       org-table-comment
       pos-tip
-      smex
+      ;smex
       yasnippet
       ssh
       htmlize
-      zenburn-theme
+      ;zenburn-theme
       extend-dnd
       solarized-theme
       textmate-to-yas
@@ -270,7 +271,7 @@ This is based on my changing [[http://eschulte.me/emacs24-starter-kit/][Emacs St
         (setq found (package--dir (symbol-name package) (format "%s" available-version))))
       (symbol-value 'found)))
   
-  (defun emacsmate-packge-load-path (package &optional subdirs)
+  (defun emacsmate-package-load-path (package &optional subdirs)
     "Adds PACKAGE to the load path.  Optionally add subdirectories (SUBDIRS)"
     (let ((default-directory (emacsmate-package-dir package)))
       (when default-directory
@@ -583,18 +584,63 @@ To use CUA-type keys and others, I use:
 
 #+BEGIN_SRC emacs-lisp
   (autoload 'log-edit-mode "log-edit" "" t)
-  (defun smex-if-exists (&optional prefix-arg)
+  (defun helm-smex-if-exists (&optional prefix-arg)
     (interactive "p")
-    (if (fboundp 'smex)
-        (smex)
-      (execute-extended-command prefix-arg)))
+    (if (fboundp 'helm-M-x)
+        (helm-M-x )
+      (if (fboundp 'smex)
+          (smex)
+        (execute-extended-command prefix-arg))))
   
-  (when (emacsmate-packge-load-path 'ergoemacs-mode)
+  (global-set-key (kbd "C-x b") 'helm-mini)
+  (when (emacsmate-package-load-path 'helm-projectile)
+    (require 'helm-projectile))
+  
+  (defun emacsmate-follow-mode ()
+    "Add follow mode to buffers and other types of things."
+    (helm-attrset 'follow 1 helm-source-buffers-list)
+    (helm-attrset 'follow 1 helm-source-moccur)
+    (helm-attrset 'follow 1 helm-c-source-projectile-buffers-list))
+  
+  (add-hook 'helm-before-initialize-hook 'emacsmate-follow-mode)
+  
+  (defun emacsmate-multi-all ()
+    "Multi-occur in all buffers (with files)"
+    (interactive)
+    (helm-multi-occur
+     (delq nil
+           (mapcar
+            (lambda(b)
+              (when (buffer-file-name b)
+                (buffer-name b)))
+            (buffer-list)))))
+  
+  (defun emacsmate-multi-projectile ()
+    "Multi-occur in project buffers"
+    (helm-multi-occur (helm-c-projectile-candidate-buffer-content)))
+  
+  (defun emacsmate-helm ()
+    "Preconfigured `helm' lightweight version \(project -> buffer -> recentf\)."
+    (interactive)
+    (require 'helm-files)
+    (require 'helm-projectile)
+    (helm-other-buffer '(helm-c-source-projectile-buffers-list
+                         helm-source-buffers-list
+                         helm-c-source-projectile-files-list
+                         helm-source-recentf
+                         helm-source-buffer-not-found)
+                       "*helm emacsmate*"))
+  
+  ;; (setq helm-before-initialize-hook nil)
+  
+  (setq helm-M-x-requires-pattern nil)
+  
+  (when (emacsmate-package-load-path 'ergoemacs-mode)
     (require 'ergoemacs-mode)
-    (ergoemacs-key "M-a" 'smex-if-exists "M-x")
+    (ergoemacs-key "M-a" 'helm-smex-if-exists "M-x")
     (ergoemacs-key "M-m" 'org-capture "Capture")
     (ergoemacs-key "M-M" 'org-agenda "Agenda")
-        (require 'expand-region)
+    (require 'expand-region)
     (ergoemacs-key "M-8" 'er/expand-region
                    (format "%sregion%s"
                            (make-string 1 8592)
@@ -611,6 +657,8 @@ To use CUA-type keys and others, I use:
     (require 'multiple-cursors)
     (ergoemacs-key "M-*" 'mc/mark-next-like-this "Mark Next")
     (ergoemacs-key "M-n" 'mc/edit-lines "Edit Lines")
+    (ergoemacs-key "M-;" 'emacsmate-multi-all "Helm moccur")
+    (ergoemacs-key "M-:" 'emacsmate-multi-all "Prj moccur")
     (ergoemacs-setup-keys)
     (ergoemacs-mode 1)
     ;;
@@ -708,7 +756,7 @@ like to insert some TextMate behaviors to my keys.
 *** Auto-complete mode
 Auto complete mode setup
 #+BEGIN_SRC emacs-lisp
-  (when (emacsmate-packge-load-path 'auto-complete)
+  (when (emacsmate-package-load-path 'auto-complete)
     (require 'auto-complete-config)
     (ac-config-default))
 #+END_SRC 
@@ -738,7 +786,7 @@ Auto complete mode setup
 #+END_SRC
 **** Pos Tip for "beautiful" tips
 #+BEGIN_SRC emacs-lisp
-  (when (emacsmate-packge-load-path 'pos-tip)
+  (when (emacsmate-package-load-path 'pos-tip)
     (require 'pos-tip)
     (when (eq system-type 'windows-nt)
       (condition-case err
@@ -924,7 +972,7 @@ I like the look.  I don't like the arrow keys not doing what I expect
 
 *** Yasnippet
 #+BEGIN_SRC emacs-lisp
-  (when (emacsmate-packge-load-path 'textmate-to-yas)
+  (when (emacsmate-package-load-path 'textmate-to-yas)
     (require 'textmate-to-yas))
   (yas-global-mode)
   (when (not (file-exists-p (expand-file-name "snippets" emacsmate-dir)))
@@ -1050,14 +1098,14 @@ Use Cperl instead of perl-mode
 #+END_SRC
 *** Dired+
 #+BEGIN_SRC emacs-lisp
-  (when (emacsmate-packge-load-path 'dired+)
+  (when (emacsmate-package-load-path 'dired+)
     (require 'dired+))
 #+END_SRC
 *** Info+
 
 *** Undo Tree
 #+BEGIN_SRC emacs-lisp
-  (when (emacsmate-packge-load-path 'undo-tree)
+  (when (emacsmate-package-load-path 'undo-tree)
     (require 'undo-tree)
     (global-undo-tree-mode))
 #+END_SRC
@@ -1065,16 +1113,19 @@ Use Cperl instead of perl-mode
 *** Extend Drag and Drop
 Drag and Drop Extend
 #+BEGIN_SRC emacs-lisp
-  (when (emacsmate-packge-load-path 'extend-dnd)
+  (when (emacsmate-package-load-path 'extend-dnd)
     (require 'extend-dnd)
     (extend-dnd-activate))
 #+END_SRC
 
 ** Mode Line Changes
-Based off of http://amitp.blogspot.com/2011/08/emacs-custom-mode-line.html
+Based off of
+http://amitp.blogspot.com/2011/08/emacs-custom-mode-line.html
+
+I have found this makes emacs slow.  I have commented it out.
 #+BEGIN_SRC emacs-lisp
   ;; Mode line setup
-  (when (emacsmate-packge-load-path 'powerline)
+  (when (and nil (emacsmate-package-load-path 'powerline))
     (require 'powerline)
     
     (defun powerline-emacsmate-theme ()
@@ -1158,17 +1209,24 @@ Based off of http://amitp.blogspot.com/2011/08/emacs-custom-mode-line.html
                           (powerline-render rhs)))))))
     
     (setq powerline-default-separator 'arrow-fade)
-    (diminish 'projectile-mode "")
-    (diminish 'undo-tree-mode "")
-    (diminish 'yas-minor-mode "")
-    ;;(diminish 'auto-indent-mode "")
-    (diminish 'autopair-mode "")
-    (diminish 'auto-complete-mode "")
-    (diminish 'flyspell-mode "")
-    (diminish 'org-indent-mode "")
-    (diminish 'iimage-mode "")
     ;;(diminish 'auto-fill-mode "")
     (powerline-emacsmate-theme))
+  (defun emacsmate-diminish ()
+    "Removes minor modes that are not that exciting..."
+    (interactive)
+    (condition-case err (diminish 'projectile-mode "") (error nil))
+    (condition-case err (diminish 'undo-tree-mode "") (error nil))
+    (condition-case err (diminish 'yas-minor-mode "") (error nil))
+    ;;(condition-case err (diminish 'auto-indent-mode "") (error nil))
+    (condition-case err (diminish 'autopair-mode "") (error nil)) 
+    (condition-case err (diminish 'auto-complete-mode "") (error nil))
+    (condition-case err (diminish 'flyspell-mode "") (error nil))
+    (condition-case err (diminish 'eldoc-mode "") (error nil))
+    (condition-case err (diminish 'org-indent-mode "") (error nil))
+    (condition-case err (diminish 'iimage-mode "")  (error nil)))
+  (add-hook 'emacs-startup-hook 'emacsmate-diminish)
+  
+  (setq ergoemacs-repeat-movement-commands 'all)
   
 #+END_SRC
 
@@ -1178,11 +1236,9 @@ Based off of http://amitp.blogspot.com/2011/08/emacs-custom-mode-line.html
 This is taken from ErgoEmacs
 
 #+BEGIN_SRC emacs-lisp
-                                          ;-*- coding: utf-8 -*-
-  
   ;; the purpose of this file is to create a more clean menu.
   ;; Rationale:
-  ;; • Emacs's Menu Usability Problem
+  ;; - Emacs's Menu Usability Problem
   ;;   http://ergoemacs.org/emacs/modernization_menu.html
   
   
@@ -1289,7 +1345,7 @@ This is taken from ErgoEmacs
           (separator-search menu-item "--")
           (search menu-item "Search"
                   (keymap
-                   (search-forward menu-item "Text…" search-forward)
+                   (search-forward menu-item "Text..." search-forward)
                    (separator-repeat-search menu-item "--")
                    (tags-srch menu-item "Search Tagged Files..." tags-search
                               :help "Search for a regexp in all tagged files")
@@ -1384,7 +1440,7 @@ This is taken from ErgoEmacs
   
   ;; (define-key menu-bar-options-menu [customize] nil)
   ;; (define-key menu-bar-options-menu [save] nil)
-  (define-key global-map (kbd "<S-down-mouse-1>") nil) ; remove Shift+“Mouse Left Button” for setting font
+  (define-key global-map (kbd "<S-down-mouse-1>") nil) ; remove Shift+Mouse Left Button for setting font
   
   ;; add a menu for showing line numbers on margin
   (define-key-after menu-bar-options-menu [showhide global-linum-mode]
@@ -1637,7 +1693,7 @@ Make camel case backward word work.
 #+END_SRC
 *** Line Numbering
 #+begin_src emacs-lisp
-  (when (emacsmate-packge-load-path 'linum-off)
+  (when (emacsmate-package-load-path 'linum-off)
     (require 'linum-off)
     (global-linum-mode 1))
     
@@ -1674,7 +1730,7 @@ Turn on save history to save history between sessions.
 *** Tabbar/Ruler & Project Management
 Setup global tabbar and ruler.
 #+BEGIN_SRC emacs-lisp
-  (when (emacsmate-packge-load-path 'tabbar-ruler)
+  (when (emacsmate-package-load-path 'tabbar-ruler)
     (with-no-warnings
       (setq tabbar-ruler-global-tabbar 't) ; If you want tabbar
       (setq tabbar-ruler-global-ruler 't) ; if you want a global ruler
@@ -1690,20 +1746,28 @@ Also set it up to be used with projectile.
   (setq projectile-require-project-root nil)
   (projectile-global-mode 1)
   
+  
+  (defvar tabbar-ruler-projectile-tabbar-buffer-group-calc nil
+    "Buffer group for projectile.  Should be buffer local and speed up calculation of buffer groups.")
   (defun tabbar-ruler-projectile-tabbar-buffer-groups ()
     "Return the list of group names BUFFER belongs to.
       Return only one group for each buffer."
-    (cond
-     ((or (get-buffer-process (current-buffer)) (memq major-mode '(comint-mode compilation-mode))) '("Term"))
-     ((string-equal "*" (substring (buffer-name) 0 1)) '("Misc"))
-     ((condition-case err
-          (projectile-project-root)
-        (error nil)) (list (projectile-project-name)))
-     ((memq major-mode '(emacs-lisp-mode python-mode emacs-lisp-mode c-mode c++-mode makefile-mode lua-mode vala-mode)) '("Coding"))
-     ((memq major-mode '(javascript-mode js-mode nxhtml-mode html-mode css-mode)) '("HTML"))
-     ((memq major-mode '(org-mode calendar-mode diary-mode)) '("Org"))
-     ((memq major-mode '(dired-mode)) '("Dir"))
-     (t '("Main"))))
+    (if tabbar-ruler-projectile-tabbar-buffer-group-calc
+        (symbol-value 'tabbar-ruler-projectile-tabbar-buffer-group-calc)
+      (set (make-local-variable 'tabbar-ruler-projectile-tabbar-buffer-group-calc)
+           
+           (cond
+            ((or (get-buffer-process (current-buffer)) (memq major-mode '(comint-mode compilation-mode))) '("Term"))
+            ((string-equal "*" (substring (buffer-name) 0 1)) '("Misc"))
+            ((condition-case err
+                 (projectile-project-root)
+               (error nil)) (list (projectile-project-name)))
+            ((memq major-mode '(emacs-lisp-mode python-mode emacs-lisp-mode c-mode c++-mode makefile-mode lua-mode vala-mode)) '("Coding"))
+            ((memq major-mode '(javascript-mode js-mode nxhtml-mode html-mode css-mode)) '("HTML"))
+            ((memq major-mode '(org-mode calendar-mode diary-mode)) '("Org"))
+            ((memq major-mode '(dired-mode)) '("Dir"))
+            (t '("Main"))))
+      (symbol-value 'tabbar-ruler-projectile-tabbar-buffer-group-calc)))
   
   (with-no-warnings
     (setq tabbar-buffer-groups-function 'tabbar-ruler-projectile-tabbar-buffer-groups))
@@ -1724,7 +1788,7 @@ Also set it up to be used with projectile.
 
 ** Saving File
 #+BEGIN_SRC emacs-lisp
-  (when (emacsmate-packge-load-path 'info+)
+  (when (emacsmate-package-load-path 'info+)
     (require 'info+))
 #+END_SRC
 *** Backups
@@ -1769,14 +1833,16 @@ However, saving can be toggled when actions occur in emacs.
 ** Color Theme
 The EmacsMate package uses the Zenburn theme by default.
 #+BEGIN_SRC emacs-lisp
-  (condition-case err
-      (when (emacsmate-packge-load-path 'zenburn-theme)
-        (load-theme 'zenburn t))
-    (error (message "Error Loading zenburn theme.")))
+  ;; (condition-case err
+  ;;     (when (emacsmate-package-load-path 'zenburn-theme)
+  ;;       (load-theme 'zenburn t))
+  ;;   (error (message "Error Loading zenburn theme.")))
   
+  (condition-case err
+      (when (emacsmate-package-load-path 'solarized-theme)
+        (load-theme 'solarized-light 't))
+    (error (message "Error Loading Solarized theme")))
 #+END_SRC
-
-
 
 ** Key Frequency
 
@@ -1784,7 +1850,7 @@ Get Key Frequency data.  This is useful to try to help customize the
 most ergonomic layouts. 
 
 #+BEGIN_SRC emacs-lisp
-  (when (emacsmate-packge-load-path 'keyfreq)
+  (when (emacsmate-package-load-path 'keyfreq)
     (with-no-warnings
       (setq keyfreq-file "~/.emacs.d/.emacs.keyfreq")
       (setq keyfreq-file-lock "~/.emacs.d/.emacs.keyfreq.lock")

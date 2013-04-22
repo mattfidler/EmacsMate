@@ -1126,7 +1126,7 @@ http://amitp.blogspot.com/2011/08/emacs-custom-mode-line.html
 I have found this makes emacs slow.  I have commented it out.
 #+BEGIN_SRC emacs-lisp
   ;; Mode line setup
-  (when (and nil (emacsmate-package-load-path 'powerline))
+  (when (and t (emacsmate-package-load-path 'powerline))
     (require 'powerline)
     
     (defun powerline-emacsmate-theme ()

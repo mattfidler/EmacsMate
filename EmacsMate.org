@@ -217,10 +217,12 @@ This is based on my changing [[http://eschulte.me/emacs24-starter-kit/][Emacs St
 #+BEGIN_SRC emacs-lisp
   (defvar emacsmate-packages
     '(org-outlook
+      ace-jump-mode
       auto-complete
       auto-indent-mode
       autopair
       keyfreq
+      golden-ratio
       ergoemacs-mode
       helm
       helm-projectile
@@ -230,13 +232,14 @@ This is based on my changing [[http://eschulte.me/emacs24-starter-kit/][Emacs St
       org-cua-dwim
       org-table-comment
       pos-tip
-      ;smex
+      ;;smex
       yasnippet
       ssh
       htmlize
-      ;zenburn-theme
+      ;;zenburn-theme
       extend-dnd
-      solarized-theme
+      ;;solarized-theme
+      monokai-theme
       textmate-to-yas
       multiple-cursors
       expand-region
@@ -354,20 +357,20 @@ a lambda doesn't already exist in the list.
 #+end_src
 ** Load Path, etc
 #+BEGIN_SRC emacs-lisp
-    (add-to-list 'load-path emacsmate-dir)
-    (defvar autoload-file (concat emacsmate-dir "loaddefs.el")
-      "EmacsMate autoload file")
-    (require 'package)
-    (when (boundp 'package-user-dir)
-      (setq package-user-dir (concat emacsmate-dir "elpa"
-                                     (cond
-                                      ((and (= emacs-major-version 24)
-                                            (>= emacs-minor-version 3))
-                                       "-24.3")
-                                      (t "")))))
-    
-    (setq custom-file (concat emacsmate-dir "custom.el"))
-    
+  (add-to-list 'load-path emacsmate-dir)
+  (defvar autoload-file (concat emacsmate-dir "loaddefs.el")
+    "EmacsMate autoload file")
+  (require 'package)
+  (when (boundp 'package-user-dir)
+    (setq package-user-dir (concat emacsmate-dir "elpa"
+                                   (cond
+                                    ((and (= emacs-major-version 24)
+                                          (>= emacs-minor-version 3))
+                                     "-24.3")
+                                    (t "")))))
+  
+  (setq custom-file (concat emacsmate-dir "custom.el"))
+  
 #+END_SRC
 ** Ubiquitous Packages
 #+BEGIN_SRC emacs-lisp
@@ -532,7 +535,6 @@ macro allows auto-installing of modes or packages:
    emacsmate-autoinstall-extensions)
   
   ;;(message "%s" (macroexpand '(autoinstall magit-status magit)))
-  
 #+END_SRC
 ** Printing
 :PROPERTIES:
@@ -594,6 +596,7 @@ To use CUA-type keys and others, I use:
         (execute-extended-command prefix-arg))))
   
   (global-set-key (kbd "C-x b") 'helm-mini)
+  
   (when (emacsmate-package-load-path 'helm-projectile)
     (require 'helm-projectile))
   
@@ -641,6 +644,7 @@ To use CUA-type keys and others, I use:
     (ergoemacs-key "M-a" 'helm-smex-if-exists "M-x")
     (ergoemacs-key "M-m" 'org-capture "Capture")
     (ergoemacs-key "M-M" 'org-agenda "Agenda")
+    (ergoemacs-key "M-b" 'ace-jump-mode "Ace Jump")
     (require 'expand-region)
     (ergoemacs-key "M-8" 'er/expand-region
                    (format "%sregion%s"
@@ -1226,8 +1230,6 @@ I have found this makes emacs slow.  I have commented it out.
     (condition-case err (diminish 'org-indent-mode "") (error nil))
     (condition-case err (diminish 'iimage-mode "")  (error nil)))
   (add-hook 'emacs-startup-hook 'emacsmate-diminish)
-  
-  (setq ergoemacs-repeat-movement-commands 'all)
   
 #+END_SRC
 
@@ -1839,10 +1841,15 @@ The EmacsMate package uses the Zenburn theme by default.
   ;;       (load-theme 'zenburn t))
   ;;   (error (message "Error Loading zenburn theme.")))
   
+  ;; (condition-case err
+  ;;     (when (emacsmate-package-load-path 'solarized-theme)
+  ;;       (load-theme 'solarized-light 't))
+  ;;   (error (message "Error Loading Solarized theme")))
+  
   (condition-case err
-      (when (emacsmate-package-load-path 'solarized-theme)
-        (load-theme 'solarized-light 't))
-    (error (message "Error Loading Solarized theme")))
+      (when (emacsmate-package-load-path 'monokai-theme)
+        (load-theme 'monokai-theme 't))
+    (error (message "Error loading monokai-theme")))
 #+END_SRC
 
 ** Key Frequency
@@ -1860,5 +1867,18 @@ most ergonomic layouts.
     (keyfreq-mode 1)
     (keyfreq-autosave-mode 1))
   
+#+END_SRC
+
+** Golden Ratio
+This is to allow better views when working with multiple windows.  I
+like it.  It looks nice.  See:
+[[https://github.com/roman/golden-ratio.el][roman/golden-ratio.el · GitHub]]
+
+#+BEGIN_SRC emacs-lisp
+  (setq golden-ratio-exclude-buffer-names '("*Calculator*" "*Calc Trail*"))
+  
+  (condition-case err
+      (golden-ratio-mode 1)
+    (error (message "Golden Ratio did not load.")))
 #+END_SRC
 

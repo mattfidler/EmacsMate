@@ -1222,12 +1222,13 @@ I have found this makes emacs slow.  I have commented it out.
     (condition-case err (diminish 'projectile-mode "") (error nil))
     (condition-case err (diminish 'undo-tree-mode "") (error nil))
     (condition-case err (diminish 'yas-minor-mode "") (error nil))
-    ;;(condition-case err (diminish 'auto-indent-mode "") (error nil))
+    (condition-case err (diminish 'auto-indent-mode "") (error nil))
     (condition-case err (diminish 'autopair-mode "") (error nil)) 
     (condition-case err (diminish 'auto-complete-mode "") (error nil))
     (condition-case err (diminish 'flyspell-mode "") (error nil))
     (condition-case err (diminish 'eldoc-mode "") (error nil))
     (condition-case err (diminish 'org-indent-mode "") (error nil))
+    (condition-case err (diminish 'golden-ratio-mode "") (error nil))
     (condition-case err (diminish 'iimage-mode "")  (error nil)))
   (add-hook 'emacs-startup-hook 'emacsmate-diminish)
   
@@ -1841,15 +1842,15 @@ The EmacsMate package uses the Zenburn theme by default.
   ;;       (load-theme 'zenburn t))
   ;;   (error (message "Error Loading zenburn theme.")))
   
-  ;; (condition-case err
-  ;;     (when (emacsmate-package-load-path 'solarized-theme)
-  ;;       (load-theme 'solarized-light 't))
-  ;;   (error (message "Error Loading Solarized theme")))
-  
   (condition-case err
-      (when (emacsmate-package-load-path 'monokai-theme)
-        (load-theme 'monokai-theme 't))
-    (error (message "Error loading monokai-theme")))
+      (when (emacsmate-package-load-path 'solarized-theme)
+        (load-theme 'solarized-light 't))
+    (error (message "Error Loading Solarized theme")))
+  
+  ;; (condition-case err
+  ;;     (when (emacsmate-package-load-path 'monokai-theme)
+  ;;       (load-theme 'monokai-theme 't))
+  ;;   (error (message "Error loading monokai-theme")))
 #+END_SRC
 
 ** Key Frequency
@@ -1874,6 +1875,9 @@ This is to allow better views when working with multiple windows.  I
 like it.  It looks nice.  See:
 [[https://github.com/roman/golden-ratio.el][roman/golden-ratio.el · GitHub]]
 
+
+I think it interferes with the calc interface, though.  I have added
+these to the excluded buffers list.
 #+BEGIN_SRC emacs-lisp
   (setq golden-ratio-exclude-buffer-names '("*Calculator*" "*Calc Trail*"))
   

@@ -661,7 +661,7 @@ To use CUA-type keys and others, I use:
       (setq expand-region-reset-fast-key (ergoemacs-kbd "9" t)))
     (require 'multiple-cursors)
     (ergoemacs-key "M-*" 'mc/mark-next-like-this "Mark Next")
-    (ergoemacs-key "M-n" 'mc/edit-lines "Edit Lines")
+    (ergoemacs-key "M-&" 'mc/edit-lines "Edit Lines")
     (ergoemacs-key "M-;" 'emacsmate-multi-all "Helm moccur")
     (ergoemacs-key "M-:" 'emacsmate-multi-all "Prj moccur")
     (ergoemacs-setup-keys)

@@ -1797,18 +1797,13 @@ Also set it up to be used with projectile.
 #+END_SRC
 *** Backups
 Rather than saving backup files scattered all over the file system,
-let them live in the backups/directory inside of the emacsmate directory.
+let them live in the backups/directory inside of the temporary directory.
 #+BEGIN_SRC emacs-lisp
-  (unless (file-exists-p (expand-file-name "backups" emacsmate-dir))
-    (make-directory (expand-file-name "backups" emacsmate-dir)))
-  
   (setq backup-directory-alist
-        `((".*" . ,(expand-file-name "backups"
-                                     emacsmate-dir))))
+        `((".*" . ,temporary-file-directory)))
   
   (setq auto-save-file-name-transforms
-        `((".*" ,(expand-file-name "backups"
-                                   emacsmate-dir) t)))
+        `((".*" ,temporary-file-directory t)))
   
   ;; From http://emacswiki.org/emacs/BackupDirectory
   (message "Deleting old backup files...")

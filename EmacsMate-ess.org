@@ -313,3 +313,12 @@ Should give:
 #+END_SRC
 
 
+* Smarter Underscores
+I like smarter underscores.
+#+BEGIN_SRC emacs-lisp
+  (unless (package-installed-p 'ess-smart-underscore)
+    (package-install 'ess-smart-underscore))
+  (when (emacsmate-package-load-path 'ess-smart-underscore)
+    (require 'ess-smart-underscore))
+#+END_SRC
+

@@ -1849,12 +1849,20 @@ these to the excluded buffers list.
 
 ** Smartparens
 #+BEGIN_SRC emacs-lisp
+  (defun emacsmate-lisp-paren ()
+    "Parenthesis operation for emacs lisp"
+    (interactive)
+    (if (looking-at "[ \t\n]*)")
+        (replace-match ")")
+      (insert ")")))
+  
   (when (emacsmate-package-load-path 'smartparens)
     (require 'smartparens-config)
     (smartparens-global-mode)
     (show-smartparens-global-mode t)
-    (add-hook 'emacs-lisp-mode-hook
-              (lambda()
-                (local-set-key (kbd ")") 'sp-up-sexp))))
+    (add-to-list 'emacs-lisp-mode-hook
+                 (lambda(x)
+                   (local-set-key (kbd ")") 'emacsmate-lisp-paren))))
+  
 #+END_SRC
 

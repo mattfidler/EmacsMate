@@ -180,8 +180,6 @@ This is based on my changing [[http://eschulte.me/emacs24-starter-kit/][Emacs St
   (declare-function ergoemacs-mode "ergoemacs-mode")
   (declare-function org-cua-dwim-activate "org-cua-dwim")
   
-  (declare-function autopair-global-mode "autopair")
-  
   (declare-function ac-config-default "auto-complete-config")
   
   (declare-function pos-tip-w32-max-width-height "pos-tip")
@@ -218,9 +216,9 @@ This is based on my changing [[http://eschulte.me/emacs24-starter-kit/][Emacs St
   (defvar emacsmate-packages
     '(org-outlook
       ace-jump-mode
+      smartparens
       auto-complete
       auto-indent-mode
-      autopair
       keyfreq
       golden-ratio
       ergoemacs-mode
@@ -735,16 +733,6 @@ This is the popup menu taken from ErgoEmacs
     
 #+END_SRC
 ** Default Package/Modes Setup
-*** Autopair
-Autopair mode allows parenthesis auto-pairing to occur for all modes
-not just list like paredit.  See [[http://www.emacswiki.org/emacs/AutoPairs#toc3][EmacsWiki: Auto Pairs]].
-#+BEGIN_SRC emacs-lisp
-  (autopair-global-mode 1)
-  (when (boundp 'autopair-skip-whitespace)
-    (setq autopair-skip-whitespace t))
-  
-#+END_SRC
-
 *** Auto-indent-mode
 The autoindent package is something that I find quite useful.  I also
 like to insert some TextMate behaviors to my keys.
@@ -842,7 +830,6 @@ This does the following:
 - Turn on coding hook
 - Removes =.elc= files on save.
 - Add =C-c v= to be `eval-buffer'
-- Adds extra autopair groups.
 - Changes adaptive filling for lisp-style comments
 #+begin_src emacs-lisp
   
@@ -863,23 +850,7 @@ This does the following:
                 (if (file-exists-p (concat buffer-file-name "c"))
                     (delete-file (concat buffer-file-name "c"))))))
   
-  (with-no-warnings
-    (defun emacsmate-add-extra-autopairs ()
-      "To add extra autopairs and change autopair behavior"
-      (when (not (featurep 'cl))
-        (require 'cl))
-      (when (boundp 'autopair-extra-pairs)
-        (when (boundp 'autopair-extra-pairs)
-          (push '(?` . ?')
-                (getf autopair-extra-pairs :comment))
-          (push '(?` . ?')
-                (getf autopair-extra-pairs :string))
-          (when (boundp 'autopair-skip-whitespace)
-            (set (make-local-variable 'autopair-skip-whitespace) 'chomp))))))
-  
-  (add-hook 'emacs-lisp-mode-hook 'emacsmate-add-extra-autopairs)
-  
-  
+    
 #+end_src
 
 **** Paste Diffs
@@ -1223,7 +1194,6 @@ I have found this makes emacs slow.  I have commented it out.
     (condition-case err (diminish 'undo-tree-mode "") (error nil))
     (condition-case err (diminish 'yas-minor-mode "") (error nil))
     (condition-case err (diminish 'auto-indent-mode "") (error nil))
-    (condition-case err (diminish 'autopair-mode "") (error nil)) 
     (condition-case err (diminish 'auto-complete-mode "") (error nil))
     (condition-case err (diminish 'flyspell-mode "") (error nil))
     (condition-case err (diminish 'eldoc-mode "") (error nil))
@@ -1707,10 +1677,6 @@ Make camel case backward word work.
 (auto-compression-mode t)
 #+END_SRC
 
-*** Highlight Matching Parenthesis 
-#+BEGIN_SRC emacs-lisp
-(show-paren-mode 1)
-#+END_SRC
 
 *** Spell Checking, Tabs, Imenu, and coding hook
 #+BEGIN_SRC emacs-lisp
@@ -1879,5 +1845,16 @@ these to the excluded buffers list.
   (condition-case err
       (golden-ratio-mode 1)
     (error (message "Golden Ratio did not load.")))
+#+END_SRC
+
+** Smartparens
+#+BEGIN_SRC emacs-lisp
+  (when (emacsmate-package-load-path 'smartparens)
+    (require 'smartparens-config)
+    (smartparens-global-mode)
+    (show-smartparens-global-mode t)
+    (add-hook 'emacs-lisp-mode-hook
+              (lambda()
+                (local-set-key (kbd ")") 'sp-up-sexp))))
 #+END_SRC
 

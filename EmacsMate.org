@@ -1847,7 +1847,7 @@ these to the excluded buffers list.
     (error (message "Golden Ratio did not load.")))
 #+END_SRC
 
-** Smartparens
+** Smart-parens
 #+BEGIN_SRC emacs-lisp
   (defun emacsmate-lisp-paren ()
     "Parenthesis operation for emacs lisp"
@@ -1861,7 +1861,7 @@ these to the excluded buffers list.
     (smartparens-global-mode)
     (show-smartparens-global-mode t)
     (add-to-list 'emacs-lisp-mode-hook
-                 (lambda(x)
+                 (lambda()
                    (local-set-key (kbd ")") 'emacsmate-lisp-paren))))
   
 #+END_SRC

@@ -640,8 +640,19 @@ To use CUA-type keys and others, I use:
   
   (setq helm-M-x-requires-pattern nil)
   
-  (when (emacsmate-package-load-path 'ergoemacs-mode)
-    (require 'ergoemacs-mode)
+  (emacsmate-package-load-path 'ergoemacs-mode)
+  
+  (when (file-exists-p (expand-file-name "~src/ergoemacs-mode"))
+    (setq load-path
+          (remove-if
+           (lambda(x)
+             (string= (expand-file-name x) (expand-file-name "~src/ergoemacs-mode")))
+           load-path))
+    (setq load-path (append (list (expand-file-name "~src/ergoemacs-mode"))
+                            load-path)))
+  
+  (require 'ergoemacs-mode nil t)
+  (when (featurep 'ergoemacs-mode) 
     (ergoemacs-key "M-a" 'helm-smex-if-exists "M-x")
     (ergoemacs-key "M-m" 'org-capture "Capture")
     (ergoemacs-key "M-M" 'org-agenda "Agenda")

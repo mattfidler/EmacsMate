@@ -13,8 +13,7 @@ project management tools for emacs:
 - [[http://stackoverflow.com/questions/978984/is-there-a-good-emacs-project-management-somewhere][Is there a good Emacs project management somewhere? ]]
 - [[http://misspent.wordpress.com/2011/05/31/eproject-anything-simple-emacs-project-management/][eproject + anything: simple emacs project management]].
 
-I have implemented projectile support because it has some support for
-version control-based projects.
+I used to implement projectile support, but I found I really didn't use any of its features. 
 
 ** Creating Projects
 Projects with projectile are created from github, bzr, etc
@@ -196,9 +195,9 @@ This is based on my changing [[http://eschulte.me/emacs24-starter-kit/][Emacs St
   
   (declare-function global-undo-tree-mode "undo-tree")
   
-  (declare-function projectile-global-mode "projectile")
-  (declare-function projectile-project-root "projectile")
-  (declare-function projectile-project-name "projectile")
+  ;; (declare-function projectile-global-mode "projectile")
+  ;; (declare-function projectile-project-root "projectile")
+  ;; (declare-function projectile-project-name "projectile")
   
   (declare-function package-installed-p "package")
   (declare-function package-version-join "package")
@@ -225,7 +224,7 @@ This is based on my changing [[http://eschulte.me/emacs24-starter-kit/][Emacs St
       golden-ratio
       ergoemacs-mode
       helm
-      helm-projectile
+      ;; helm-projectile
       undo-tree
       ido-ubiquitous
       melpa
@@ -246,7 +245,7 @@ This is based on my changing [[http://eschulte.me/emacs24-starter-kit/][Emacs St
       dired+
       info+
       linum-off
-      projectile
+      ;; projectile
       powerline
       diminish
       header2
@@ -598,14 +597,15 @@ To use CUA-type keys and others, I use:
   (when window-system
     (global-set-key (kbd "C-x b") 'helm-mini))
   
-  (when (emacsmate-package-load-path 'helm-projectile)
-    (require 'helm-projectile))
+  ;; (when (emacsmate-package-load-path 'helm-projectile)
+  ;;   (require 'helm-projectile))
   
   (defun emacsmate-follow-mode ()
     "Add follow mode to buffers and other types of things."
     (helm-attrset 'follow 1 helm-source-buffers-list)
     (helm-attrset 'follow 1 helm-source-moccur)
-    (helm-attrset 'follow 1 helm-c-source-projectile-buffers-list))
+    ;; (helm-attrset 'follow 1 helm-c-source-projectile-buffers-list)
+    )
   
   (add-hook 'helm-before-initialize-hook 'emacsmate-follow-mode)
   
@@ -620,18 +620,18 @@ To use CUA-type keys and others, I use:
                 (buffer-name b)))
             (buffer-list)))))
   
-  (defun emacsmate-multi-projectile ()
-    "Multi-occur in project buffers"
-    (helm-multi-occur (helm-c-projectile-candidate-buffer-content)))
+  ;; (defun emacsmate-multi-projectile ()
+  ;;   "Multi-occur in project buffers"
+  ;;   (helm-multi-occur (helm-c-projectile-candidate-buffer-content)))
   
   (defun emacsmate-helm ()
     "Preconfigured `helm' lightweight version \(project -> buffer -> recentf\)."
     (interactive)
     (require 'helm-files)
-    (require 'helm-projectile)
-    (helm-other-buffer '(helm-c-source-projectile-buffers-list
+    ;; (require 'helm-projectile)
+    (helm-other-buffer '(;; helm-c-source-projectile-buffers-list
                          helm-source-buffers-list
-                         helm-c-source-projectile-files-list
+                         ;; helm-c-source-projectile-files-list
                          helm-source-recentf
                          helm-source-buffer-not-found)
                        "*helm emacsmate*"))
@@ -1229,7 +1229,7 @@ I have found this makes emacs slow.  I have commented it out.
   (defun emacsmate-diminish ()
     "Removes minor modes that are not that exciting..."
     (interactive)
-    (condition-case err (diminish 'projectile-mode "") (error nil))
+    ;; (condition-case err (diminish 'projectile-mode "") (error nil))
     (condition-case err (diminish 'undo-tree-mode "") (error nil))
     (condition-case err (diminish 'yas-minor-mode "") (error nil))
     (condition-case err (diminish 'auto-indent-mode "") (error nil))
@@ -1753,34 +1753,34 @@ Setup global tabbar and ruler.
 Also set it up to be used with projectile.
 
 #+BEGIN_SRC emacs-lisp
-  (setq projectile-require-project-root nil)
-  (projectile-global-mode 1)
+  ;; (setq projectile-require-project-root nil)
+  ;; (projectile-global-mode 1)
   
   
-  (defvar tabbar-ruler-projectile-tabbar-buffer-group-calc nil
-    "Buffer group for projectile.  Should be buffer local and speed up calculation of buffer groups.")
-  (defun tabbar-ruler-projectile-tabbar-buffer-groups ()
-    "Return the list of group names BUFFER belongs to.
-      Return only one group for each buffer."
-    (if tabbar-ruler-projectile-tabbar-buffer-group-calc
-        (symbol-value 'tabbar-ruler-projectile-tabbar-buffer-group-calc)
-      (set (make-local-variable 'tabbar-ruler-projectile-tabbar-buffer-group-calc)
+  ;; (defvar tabbar-ruler-projectile-tabbar-buffer-group-calc nil
+  ;;   "Buffer group for projectile.  Should be buffer local and speed up calculation of buffer groups.")
+  ;; (defun tabbar-ruler-projectile-tabbar-buffer-groups ()
+  ;;   "Return the list of group names BUFFER belongs to.
+  ;;     Return only one group for each buffer."
+  ;;   (if tabbar-ruler-projectile-tabbar-buffer-group-calc
+  ;;       (symbol-value 'tabbar-ruler-projectile-tabbar-buffer-group-calc)
+  ;;     (set (make-local-variable 'tabbar-ruler-projectile-tabbar-buffer-group-calc)
            
-           (cond
-            ((or (get-buffer-process (current-buffer)) (memq major-mode '(comint-mode compilation-mode))) '("Term"))
-            ((string-equal "*" (substring (buffer-name) 0 1)) '("Misc"))
-            ((condition-case err
-                 (projectile-project-root)
-               (error nil)) (list (projectile-project-name)))
-            ((memq major-mode '(emacs-lisp-mode python-mode emacs-lisp-mode c-mode c++-mode makefile-mode lua-mode vala-mode)) '("Coding"))
-            ((memq major-mode '(javascript-mode js-mode nxhtml-mode html-mode css-mode)) '("HTML"))
-            ((memq major-mode '(org-mode calendar-mode diary-mode)) '("Org"))
-            ((memq major-mode '(dired-mode)) '("Dir"))
-            (t '("Main"))))
-      (symbol-value 'tabbar-ruler-projectile-tabbar-buffer-group-calc)))
+  ;;          (cond
+  ;;           ((or (get-buffer-process (current-buffer)) (memq major-mode '(comint-mode compilation-mode))) '("Term"))
+  ;;           ((string-equal "*" (substring (buffer-name) 0 1)) '("Misc"))
+  ;;           ((condition-case err
+  ;;                (projectile-project-root)
+  ;;              (error nil)) (list (projectile-project-name)))
+  ;;           ((memq major-mode '(emacs-lisp-mode python-mode emacs-lisp-mode c-mode c++-mode makefile-mode lua-mode vala-mode)) '("Coding"))
+  ;;           ((memq major-mode '(javascript-mode js-mode nxhtml-mode html-mode css-mode)) '("HTML"))
+  ;;           ((memq major-mode '(org-mode calendar-mode diary-mode)) '("Org"))
+  ;;           ((memq major-mode '(dired-mode)) '("Dir"))
+  ;;           (t '("Main"))))
+  ;;     (symbol-value 'tabbar-ruler-projectile-tabbar-buffer-group-calc)))
   
-  (with-no-warnings
-    (setq tabbar-buffer-groups-function 'tabbar-ruler-projectile-tabbar-buffer-groups))
+  ;; (with-no-warnings
+  ;;   (setq tabbar-buffer-groups-function 'tabbar-ruler-projectile-tabbar-buffer-groups))
 #+END_SRC
 *** Cosmetics
 

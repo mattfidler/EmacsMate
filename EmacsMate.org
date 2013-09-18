@@ -179,8 +179,6 @@ This is based on my changing [[http://eschulte.me/emacs24-starter-kit/][Emacs St
   (declare-function ergoemacs-mode "ergoemacs-mode")
   (declare-function org-cua-dwim-activate "org-cua-dwim")
   
-  (declare-function autopair-global-mode "autopair")
-  
   (declare-function ac-config-default "auto-complete-config")
   
   (declare-function pos-tip-w32-max-width-height "pos-tip")
@@ -219,7 +217,6 @@ This is based on my changing [[http://eschulte.me/emacs24-starter-kit/][Emacs St
       ace-jump-mode
       auto-complete
       auto-indent-mode
-      autopair
       keyfreq
       golden-ratio
       ergoemacs-mode
@@ -250,9 +247,9 @@ This is based on my changing [[http://eschulte.me/emacs24-starter-kit/][Emacs St
       diminish
       header2
       lib-requires
+      smartparens
       tabbar-ruler)
     "Libraries that should be installed by default.")
-  
 #+END_SRC
 
 *** ELPA functions
@@ -682,8 +679,8 @@ To use CUA-type keys and others, I use:
     (global-set-key "\C-x\C-c" 'ignore)
     (global-set-key "\C-x\C-z" 'ignore)
     (global-set-key (kbd "C-M-S-Q") 'save-buffers-kill-emacs))
-  (cua-mode) 
-  (org-cua-dwim-activate)
+  ;; (cua-mode) 
+  ;; (org-cua-dwim-activate)
   
 #+END_SRC
 *** Additional Key Bindings
@@ -751,27 +748,41 @@ This is the popup menu taken from ErgoEmacs
 Autopair mode allows parenthesis auto-pairing to occur for all modes
 not just list like paredit.  See [[http://www.emacswiki.org/emacs/AutoPairs#toc3][EmacsWiki: Auto Pairs]].
 #+BEGIN_SRC emacs-lisp
-  (autopair-global-mode 1)
-  (when (boundp 'autopair-skip-whitespace)
-    (setq autopair-skip-whitespace t))
+  ;; (autopair-global-mode 1)
+  ;; (when (boundp 'autopair-skip-whitespace)
+  ;;   (setq autopair-skip-whitespace t))
   
-  (with-no-warnings
-    (defun emacsmate-add-extra-autopairs ()
-        "To add extra autopairs and change autopair behavior"
-        (when (not (featurep 'cl))
-          (require 'cl))
-        (when (boundp 'autopair-extra-pairs)
-          (when (boundp 'autopair-extra-pairs)
-            (push '(?` . ?')
-                  (getf autopair-extra-pairs :comment))
-            (push '(?` . ?')
-                  (getf autopair-extra-pairs :string))
-            (when (boundp 'autopair-skip-whitespace)
-              (set (make-local-variable 'autopair-skip-whitespace) 'chomp))))))
+  ;; (with-no-warnings
+  ;;   (defun emacsmate-add-extra-autopairs ()
+  ;;       "To add extra autopairs and change autopair behavior"
+  ;;       (when (not (featurep 'cl))
+  ;;         (require 'cl))
+  ;;       (when (boundp 'autopair-extra-pairs)
+  ;;         (when (boundp 'autopair-extra-pairs)
+  ;;           (push '(?` . ?')
+  ;;                 (getf autopair-extra-pairs :comment))
+  ;;           (push '(?` . ?')
+  ;;                 (getf autopair-extra-pairs :string))
+  ;;           (when (boundp 'autopair-skip-whitespace)
+  ;;             (set (make-local-variable 'autopair-skip-whitespace) 'chomp))))))
     
-    (add-hook 'emacs-lisp-mode-hook 'emacsmate-add-extra-autopairs)
+  ;;   (add-hook 'emacs-lisp-mode-hook 'emacsmate-add-extra-autopairs)
   
 #+END_SRC
+*** Smartparens
+#+BEGIN_SRC emacs-lisp
+  (when (emacsmate-package-load-path 'smartparens)
+  (require 'smartparens-config)
+  (smartparens-global-mode 1)
+  (define-key emacs-lisp-mode-map (kbd ")") 'sp-up-sexp)
+  (defun emacsmate-smartparens-emacs-mode-hook ()
+    "Change `sp-navigate-close-if-unbalanced' to be non-nil in emacs-buffers"
+    (set (make-local-variable 'sp-navigate-close-if-unbalanced) t))
+  
+  (add-hook 'emacs-lisp-mode-hook
+            'emacsmate-smartparens-emacs-mode-hook))
+#+END_SRC
+
 *** Auto-indent-mode
 The autoindent package is something that I find quite useful.  I also
 like to insert some TextMate behaviors to my keys.
@@ -877,6 +888,7 @@ This does the following:
   (add-hook 'emacs-lisp-mode-hook 'emacsmate-remove-elc-on-save)
   ;; (add-hook 'emacs-lisp-mode-hook 'idle-highlight)
   (define-key emacs-lisp-mode-map (kbd "C-c v") 'eval-buffer)
+  (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'eval-defun)
   
   
   

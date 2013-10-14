@@ -763,17 +763,17 @@ not just list like paredit.  See [[http://www.emacswiki.org/emacs/AutoPairs#toc3
 #+END_SRC
 *** Smartparens
 #+BEGIN_SRC emacs-lisp
-  (when (emacsmate-package-load-path 'smartparens)
-    (setq sp-autoinsert-if-followed-by-word t)
-    (require 'smartparens-config)
-    (smartparens-global-mode 1)
-    (define-key emacs-lisp-mode-map (kbd ")") 'sp-up-sexp)
-    (defun emacsmate-smartparens-emacs-mode-hook ()
-      "Change `sp-navigate-close-if-unbalanced' to be non-nil in emacs-buffers"
-      (set (make-local-variable 'sp-navigate-close-if-unbalanced) t))
-  
-    (add-hook 'emacs-lisp-mode-hook
-              'emacsmate-smartparens-emacs-mode-hook))
+    (when (emacsmate-package-load-path 'smartparens)
+      (setq sp-autoinsert-if-followed-by-word t)
+      (require 'smartparens-config)
+      (smartparens-global-mode 1)
+      (define-key emacs-lisp-mode-map (kbd ")") 'sp-up-sexp)
+      (defun emacsmate-smartparens-emacs-mode-hook ()
+        "Change `sp-navigate-close-if-unbalanced' to be non-nil in emacs-buffers"
+        (set (make-local-variable 'sp-navigate-close-if-unbalanced) t))
+      
+      (add-hook 'emacs-lisp-mode-hook
+                'emacsmate-smartparens-emacs-mode-hook))
 #+END_SRC
 
 *** Auto-indent-mode

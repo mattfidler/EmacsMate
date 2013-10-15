@@ -322,3 +322,10 @@ I like smarter underscores.
     (require 'ess-smart-underscore))
 #+END_SRC
 
+* SAS
+For some reason, =SAS-mode= errors out for with =ess-ac-sources=
+being a void variable.  Thats easy to fix:
+
+#+BEGIN_SRC emacs-lisp
+  (setq ess-ac-sources nil)
+#+END_SRC

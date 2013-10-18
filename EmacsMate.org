@@ -641,36 +641,25 @@ To use CUA-type keys and others, I use:
     (setq load-path (append (list (expand-file-name "~src/ergoemacs-mode"))
                             load-path)))
   
-  (require 'ergoemacs-mode nil t)
-  (when (featurep 'ergoemacs-mode)
-    (ergoemacs-key "M-m" 'org-capture "Capture")
-    (ergoemacs-key "M-M" 'org-agenda "Agenda")
-    (ergoemacs-key "M-b" 'ace-jump-mode "Ace Jump")
-    (require 'expand-region)
-    (ergoemacs-key "M-8" 'er/expand-region
-                   (format "%sregion%s"
-                           (make-string 1 8592)
-                           (make-string 1 8594)))
-    
-    (ergoemacs-key "M-9" 'er/contract-region
-                   (format "%sregion%s"
-                           (make-string 1 8594)
-                           (make-string 1 8592)))
-    (when (boundp 'expand-region-contract-fast-key)
-      (setq expand-region-contract-fast-key (ergoemacs-kbd "7" t)))
-    (when (boundp 'expand-region-reset-fast-key)
-      (setq expand-region-reset-fast-key (ergoemacs-kbd "9" t)))
-    (require 'multiple-cursors)
+  (setq ergoemacs-beginning-or-end-of-line-and-what 'page)
+  (require 'ergoemacs-mode)
+  (ergoemacs-deftheme mate
+    "EmacsMate"
+    nil
     (ergoemacs-key "M-*" 'mc/mark-next-like-this "Mark Next")
     (ergoemacs-key "M-&" 'mc/edit-lines "Edit Lines")
-    (ergoemacs-key "M-;" 'emacsmate-multi-all "Helm moccur")
-    (ergoemacs-key "M-:" 'emacsmate-multi-all "Prj moccur")
-    (ergoemacs-setup-keys)
-    (ergoemacs-mode 1)
-    ;;
-    (global-set-key "\C-x\C-c" 'ignore)
-    (global-set-key "\C-x\C-z" 'ignore)
-    (global-set-key (kbd "C-M-S-Q") 'save-buffers-kill-emacs))
+    (ergoemacs-key "M-," 'goto-last-change "Goto Last Change")
+    (ergoemacs-key "M-." 'ergoemacs-end-of-line-or-what (format "%s line/*" (make-string 1 8592)))
+    (ergoemacs-key "M-m" 'ergoemacs-beginning-of-line-or-what (format "%s line/*" (make-string 1 8594)))
+    (ergoemacs-key "M-t" 'execute-extended-command "M-x")
+    (ergoemacs-key "M-a" 'ergoemacs-call-keyward-completion "compl")
+    (ergoemacs-key "M-9" 'er/contract-region (format "%sregion%s"
+                                                     (make-string 1 8594)
+                                                     (make-string 1 8592)))
+    (ergoemacs-key "M-;" 'emacsmate-multi-all "Helm moccur"))
+  
+  (setq ergoemacs-theme "mate")
+  (ergoemacs-mode 1)
   ;; (cua-mode) 
   ;; (org-cua-dwim-activate)
   

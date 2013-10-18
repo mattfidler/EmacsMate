@@ -112,7 +112,9 @@
                            (error "Error Loading %s" compiled-file))))
                 (emacsmate-m (format "Loaded %s" compiled-file)))
             (condition-case err
-                (byte-compile-file exported-file t)
+                (progn
+		  (load-file exported-file)
+		  (byte-compile-file exported-file))
               (error (if emacsmate-grace
                          (message "Error Byte-compiling and loading %s" exported-file)
                        (error "Error Byte-compiling and loading %s" exported-file))))

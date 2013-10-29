@@ -230,6 +230,11 @@ the org-mode files in the current window.
 #+END_SRC
 
 
+** Smart beginning and end of lines
+#+BEGIN_SRC emacs-lisp
+  (setq org-special-ctrl-a/e t)
+#+END_SRC
+
 ** Org Options
 #+BEGIN_SRC emacs-lisp
   (emacsmate-m "Org Options") 

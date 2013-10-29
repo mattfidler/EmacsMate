@@ -771,6 +771,19 @@ not just list like paredit.  See [[http://www.emacswiki.org/emacs/AutoPairs#toc3
 The autoindent package is something that I find quite useful.  I also
 like to insert some TextMate behaviors to my keys.
 #+BEGIN_SRC emacs-lisp
+  (setq load-path (remove-if
+                   #'(lambda(x)
+                       (string-match "auto-indent-mode" x)) load-path))
+  
+  (if  (not (file-exists-p (expand-file-name "~src/auto-indent-mode.el/")))
+      (emacsmate-package-load-path 'auto-indent-mode)
+    (load "~src/auto-indent-mode.el/auto-indent-mode")
+    (setq load-path (append (list (expand-file-name "~src/auto-indent-mode.el/"))
+                            load-path)))
+  
+  (require 'auto-indent-mode nil t)
+  
+  
   (with-no-warnings
     (setq auto-indent-key-for-end-of-line-then-newline "<M-return>")
     (setq auto-indent-key-for-end-of-line-insert-char-then-newline "<M-S-return>")

@@ -219,13 +219,15 @@ This is based on my changing [[http://eschulte.me/emacs24-starter-kit/][Emacs St
       auto-indent-mode
       keyfreq
       golden-ratio
+      highlight-symbol
+      visual-regexp
       ergoemacs-mode
       helm
       ;; helm-projectile
       undo-tree
       ido-ubiquitous
       melpa
-      org-cua-dwim
+      ;;org-cua-dwim
       org-table-comment
       pos-tip
       ;;smex

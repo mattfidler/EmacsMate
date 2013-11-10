@@ -13,20 +13,8 @@ project management tools for emacs:
 - [[http://stackoverflow.com/questions/978984/is-there-a-good-emacs-project-management-somewhere][Is there a good Emacs project management somewhere? ]]
 - [[http://misspent.wordpress.com/2011/05/31/eproject-anything-simple-emacs-project-management/][eproject + anything: simple emacs project management]].
 
-I used to implement projectile support, but I found I really didn't use any of its features. 
-
-** Creating Projects
-Projects with projectile are created from github, bzr, etc
-repositories are automatically considered projects.
-** Filtering Unwanted files
-Unwanted files are filtered with a =.projectile= file.
-** Navigating files in a project
-When files are opened, the tabbar groups them by Projectile Project.
-** Find and Replace in Projects
-This can be accessed in the Projectile menu or keybindings.
-** Moving between project files
-
-** Using Helm
+I used to implement projectile support, but I found I really didn't
+use any of its features.
 
 * Key Bindings
 Typically TextMate uses [[http://www.emacswiki.org/CuaMode][Cua Mode]].  This does not provide all the
@@ -132,6 +120,7 @@ This is implemented by autopair-mode
 * Working with Version Control
 * Macros
 * Regular Expressions
+This uses visual regular expressions.
 * Calling Emacs from other applications
 See [[http://manual.macromates.com/en/using_textmate_from_terminal.html][Calling TextMate from Other Applications]]
 ** Browsers
@@ -586,49 +575,15 @@ To use CUA-type keys and others, I use:
 #+BEGIN_SRC emacs-lisp
   (autoload 'log-edit-mode "log-edit" "" t)
   
-  (when window-system
-    (global-set-key (kbd "C-x b") 'helm-mini))
-  
-  ;; (when (emacsmate-package-load-path 'helm-projectile)
-  ;;   (require 'helm-projectile))
-  
   (defun emacsmate-follow-mode ()
     "Add follow mode to buffers and other types of things."
     (helm-attrset 'follow 1 helm-source-buffers-list)
     (helm-attrset 'follow 1 helm-source-moccur)
+    (helm-attrset 'follow 1 helm-source-grep)
     ;; (helm-attrset 'follow 1 helm-c-source-projectile-buffers-list)
     )
   
   (add-hook 'helm-before-initialize-hook 'emacsmate-follow-mode)
-  
-  (defun emacsmate-multi-all ()
-    "Multi-occur in all buffers (with files)"
-    (interactive)
-    (helm-multi-occur
-     (delq nil
-           (mapcar
-            (lambda(b)
-              (when (buffer-file-name b)
-                (buffer-name b)))
-            (buffer-list)))))
-  
-  ;; (defun emacsmate-multi-projectile ()
-  ;;   "Multi-occur in project buffers"
-  ;;   (helm-multi-occur (helm-c-projectile-candidate-buffer-content)))
-  
-  (defun emacsmate-helm ()
-    "Preconfigured `helm' lightweight version \(project -> buffer -> recentf\)."
-    (interactive)
-    (require 'helm-files)
-    ;; (require 'helm-projectile)
-    (helm-other-buffer '(;; helm-c-source-projectile-buffers-list
-                         helm-source-buffers-list
-                         ;; helm-c-source-projectile-files-list
-                         helm-source-recentf
-                         helm-source-buffer-not-found)
-                       "*helm emacsmate*"))
-  
-  ;; (setq helm-before-initialize-hook nil)
   
   (setq helm-M-x-requires-pattern nil)
   
@@ -648,6 +603,13 @@ To use CUA-type keys and others, I use:
   
   (setq ergoemacs-theme "reduction")
   (ergoemacs-mode 1)
+  
+  (cond
+   ((eq system-type 'windows-nt)
+    (ido-mode 1))
+   (t
+    (helm-mode 1)))
+  
   ;; (cua-mode) 
   ;; (org-cua-dwim-activate)
   
@@ -922,7 +884,7 @@ explanation of these customizations.
 #+srcname: emacsmate-loves-ido-mode
 #+begin_src emacs-lisp 
   (when (> emacs-major-version 21)
-    (ido-mode t)
+    ;; (ido-mode t)
     (mapc (lambda(ext)
             (add-to-list 'completion-ignored-extensions ext))
           '("elc" "exe" "com" "org_archive" "png" "gif" "csv" "jpg" "jpeg"))
@@ -1317,6 +1279,15 @@ Turn on save history to save history between sessions.
 #+BEGIN_SRC emacs-lisp
   (savehist-mode 1)
 #+END_SRC
+*** Easier mark-ring management
+When navigating through the mark ring (started by =C-u C-<SPC>=),
+subsequent =C-<SPC>= keypresses will navigate through the mark ring
+instead of setting the mark command.
+
+#+BEGIN_SRC emacs-lisp 
+  (setq set-mark-command-repeat-pop t)
+#+END_SRC
+
 *** Tabbar/Ruler & Project Management
 Setup global tabbar and ruler.
 #+BEGIN_SRC emacs-lisp

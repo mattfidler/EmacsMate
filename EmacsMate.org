@@ -215,6 +215,8 @@ This is based on my changing [[http://eschulte.me/emacs24-starter-kit/][Emacs St
       ;; helm-projectile
       undo-tree
       ido-ubiquitous
+      ido-vertical-mode
+      flx-ido
       melpa
       ;;org-cua-dwim
       org-table-comment
@@ -579,8 +581,8 @@ To use CUA-type keys and others, I use:
     "Add follow mode to buffers and other types of things."
     (helm-attrset 'follow 1 helm-source-buffers-list)
     (helm-attrset 'follow 1 helm-source-moccur)
-    (helm-attrset 'follow 1 helm-source-grep)
-    ;; (helm-attrset 'follow 1 helm-c-source-projectile-buffers-list)
+    ;;(helm-attrset 'follow 1 helm-source-grep)
+    ;;(helm-attrset 'follow 1 helm-c-source-projectile-buffers-list)
     )
   
   (add-hook 'helm-before-initialize-hook 'emacsmate-follow-mode)
@@ -604,12 +606,16 @@ To use CUA-type keys and others, I use:
   (setq ergoemacs-theme "reduction")
   (ergoemacs-mode 1)
   
-  (cond
-   ((eq system-type 'windows-nt)
-    (ido-mode 1))
-   (t
-    (helm-mode 1)))
+  ;; (cond
+  ;;  ((eq system-type 'windows-nt)
+  ;;   (ido-mode 1))
+  ;;  (t
+  ;;   (helm-mode 1)))
   
+  (ido-mode 1)
+  (setq gc-cons-threshold 20000000)
+  (ido-vertical-mode 1)
+  (flx-ido-mode 1)
   ;; (cua-mode) 
   ;; (org-cua-dwim-activate)
   
@@ -909,10 +915,10 @@ See http://www.emacswiki.org/emacs/InteractivelyDoThings
 I like the look.  I don't like the arrow keys not doing what I expect
 (changed with ergoemacs)
 #+BEGIN_SRC emacs-lisp
-  (setq ido-decorations (quote ("\n-> " "" "\n   " "\n   ..." "[" "]" " [No match]" " [Matched]" " [Not readable]" " [Too big]" " [Confirm]")))
+  ;; (setq ido-decorations (quote ("\n-> " "" "\n   " "\n   ..." "[" "]" " [No match]" " [Matched]" " [Not readable]" " [Too big]" " [Confirm]")))
   
-  (defun ido-disable-line-trucation () (set (make-local-variable 'truncate-lines) nil))
-  (add-hook 'ido-minibuffer-setup-hook 'ido-disable-line-trucation)
+  ;; (defun ido-disable-line-trucation () (set (make-local-variable 'truncate-lines) nil))
+  ;; (add-hook 'ido-minibuffer-setup-hook 'ido-disable-line-trucation)
 #+END_SRC
 
 

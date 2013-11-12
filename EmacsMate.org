@@ -613,8 +613,9 @@ To use CUA-type keys and others, I use:
   ;;   (helm-mode 1)))
   
   (ido-mode 1)
-  (setq gc-cons-threshold 20000000)
+  (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right)
   (ido-vertical-mode 1)
+  (setq gc-cons-threshold 20000000)
   (flx-ido-mode 1)
   ;; (cua-mode) 
   ;; (org-cua-dwim-activate)

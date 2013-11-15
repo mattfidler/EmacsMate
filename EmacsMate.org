@@ -1356,7 +1356,10 @@ Also set it up to be used with projectile.
        (set-face-foreground 'magit-diff-del "red3")))
   
   (when (fboundp 'rainbow-mode)
-    (define-globalized-minor-mode rainbow-global-mode rainbow-mode rainbow-turn-on)
+    (define-globalized-minor-mode rainbow-global-mode rainbow-mode
+      '(lambda(x)
+         (unless (memq major-mode '(magit-mode))
+           t)))
     (rainbow-global-mode))
 #+end_src
 

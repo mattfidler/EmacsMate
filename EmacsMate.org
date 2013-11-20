@@ -618,6 +618,7 @@ To use CUA-type keys and others, I use:
   ;; (ido-vertical-mode 1)
   ;; (setq gc-cons-threshold 20000000)
   ;; (flx-ido-mode 1)
+  
   (helm-mode 1)
   
   ;; (cua-mode) 
@@ -931,10 +932,11 @@ I like the look.  I don't like the arrow keys not doing what I expect
   ;; disable auto searching for files unless called explicitly
   (setq ido-auto-merge-delay-time 99999)
   
-  (define-key ido-file-dir-completion-map (kbd "C-c C-s") 
-    (lambda() 
-      (interactive)
-      (ido-initiate-auto-merge (current-buffer))))
+  (when ido-mode
+    (define-key ido-file-dir-completion-map (kbd "C-c C-s") 
+      (lambda() 
+        (interactive)
+        (ido-initiate-auto-merge (current-buffer)))))
 #+END_SRC
 
 *** Scheme

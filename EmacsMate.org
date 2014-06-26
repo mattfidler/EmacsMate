@@ -1462,3 +1462,8 @@ these to the excluded buffers list.
   ;;(icy-mode 1)
 #+END_SRC
 
+** Org Outlook
+#+BEGIN_SRC emacs-lisp
+  (setq org-protocol-outlook-default-template-key "o")
+#+END_SRC
+

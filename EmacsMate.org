@@ -355,6 +355,9 @@ a lambda doesn't already exist in the list.
     (setq package-user-dir (concat emacsmate-dir "elpa"
                                    (cond
                                     ((and (= emacs-major-version 24)
+                                          (>= emacs-minor-version 4))
+                                     "-24.4")
+                                    ((and (= emacs-major-version 24)
                                           (>= emacs-minor-version 3))
                                      "-24.3")
                                     (t "")))))
@@ -1466,4 +1469,7 @@ these to the excluded buffers list.
 #+BEGIN_SRC emacs-lisp
   (setq org-protocol-outlook-default-template-key "o")
 #+END_SRC
+
+#+RESULTS:
+: o
 

@@ -218,7 +218,7 @@ This is based on my changing [[http://eschulte.me/emacs24-starter-kit/][Emacs St
       ido-vertical-mode
       rainbow-mode
       flx-ido
-      melpa
+      ;; melpa
       ;;org-cua-dwim
       org-table-comment
       pos-tip

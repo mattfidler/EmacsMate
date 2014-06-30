@@ -97,8 +97,8 @@
               (emacsmate-m (format "Tangled %s to %s"
                                    file exported-file)))
           (error (if emacsmate-grace
-                     (message "Error Tangling %s" file)
-                   (error "Error Tangling %s" file)))))
+                     (message "Error Tangling %s; %s" file err)
+                   (error "Error Tangling %s; %s" file err)))))
       (when (file-exists-p exported-file)
         (if (and (boundp 'auto-compile-on-load-mode) auto-compile-on-load-mode)
             (load exported-file)

@@ -111,6 +111,12 @@ This is implemented by autopair-mode
 
 ** Spell Checking
 
+** Renumbering Items
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-c +") 'evil-numbers/inc-at-pt)
+  (global-set-key (kbd "C-c -") 'evil-numbers/dec-at-pt)
+#+END_SRC
+
 * Modes
 * Snippets
 ** Importing Textmate bundles
@@ -206,6 +212,7 @@ This is based on my changing [[http://eschulte.me/emacs24-starter-kit/][Emacs St
       ace-jump-mode
       auto-complete
       auto-indent-mode
+      evil-numbers
       keyfreq
       golden-ratio
       highlight-symbol
@@ -260,7 +267,10 @@ This is based on my changing [[http://eschulte.me/emacs24-starter-kit/][Emacs St
           available-version found)
       ;; Check if PACKAGE is available in `package-alist'.
       (when pkg-vec
-        (setq available-version (package-version-join (package-desc-vers pkg-vec)))
+        (when (fboundp 'package-desc-vers)
+          (setq available-version (package-version-join (package-desc-vers pkg-vec))))
+        (when (fboundp 'package-desc-version)
+          (setq available-version (package-version-join (package-desc-version pkg-vec))))
         (setq found (package--dir (symbol-name package) (format "%s" available-version))))
       (symbol-value 'found)))
   

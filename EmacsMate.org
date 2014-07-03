@@ -372,8 +372,6 @@ a lambda doesn't already exist in the list.
                                      "-24.3")
                                     (t "")))))
   
-  (setq custom-file (concat emacsmate-dir "custom.el"))
-  
 #+END_SRC
 ** Ubiquitous Packages
 #+BEGIN_SRC emacs-lisp
@@ -1483,3 +1481,7 @@ these to the excluded buffers list.
 #+RESULTS:
 : o
 
+* Load custom
+#+BEGIN_SRC emacs-lisp
+  (setq custom-file (concat emacsmate-dir "custom.el"))
+#+END_SRC

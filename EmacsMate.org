@@ -575,10 +575,6 @@ This implements printing assuming:
 #+END_SRC
 ** Coding Hook
 
-** Customize Settings
-#+BEGIN_SRC emacs-lisp
-(load custom-file 'noerror)
-#+END_SRC
 ** Key Bindings
 To use CUA-type keys and others, I use:
 - Ergoemacs-key bingings, plus a bit extra
@@ -1484,4 +1480,7 @@ these to the excluded buffers list.
 * Load custom
 #+BEGIN_SRC emacs-lisp
   (setq custom-file (concat emacsmate-dir "custom.el"))
+  (load custom-file 'noerror)
+  
 #+END_SRC
+
